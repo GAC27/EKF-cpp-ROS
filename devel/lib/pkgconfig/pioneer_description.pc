@@ -1,0 +1,8 @@
+prefix=/home/gac/gazebo2-pioneer/devel
+
+Name: pioneer_description
+Description: Description of pioneer_description
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/gac/gazebo2-pioneer/devel/lib 
+Requires: 

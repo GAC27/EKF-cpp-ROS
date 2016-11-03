@@ -1,0 +1,2 @@
+nav_bundle:pioneer_2dnav:pioneer_gazebo_ros/pioneer_control:pioneer_gazebo_ros/pioneer_description:pioneer_gazebo_ros/pioneer_gazebo:pioneer_gazebo_ros/pioneer_ros:simple_navigation_goals:teleop_twist_keyboard
+-DCATKIN_DEVEL_PREFIX=/home/gac/gazebo2-pioneer/devel -DCMAKE_INSTALL_PREFIX=/home/gac/gazebo2-pioneer/install -G Unix Makefiles
