@@ -1,8 +1,0 @@
-prefix=/home/tiago/Untitled Folder 2/SistemasAutonomos/install
-
-Name: pioneer_gazebo
-Description: Description of pioneer_gazebo
-Version: 0.1.0
-Cflags: 
-Libs: -L/home/tiago/Untitled Folder 2/SistemasAutonomos/install/lib 
-Requires: 

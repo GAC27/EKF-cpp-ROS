@@ -1,8 +1,0 @@
-prefix=/home/tiago/Untitled Folder 2/SistemasAutonomos/install
-
-Name: nav_bundle
-Description: Description of nav_bundle
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/tiago/Untitled Folder 2/SistemasAutonomos/install/lib 
-Requires: 
