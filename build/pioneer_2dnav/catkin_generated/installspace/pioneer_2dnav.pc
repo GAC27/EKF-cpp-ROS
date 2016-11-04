@@ -1,8 +1,8 @@
-prefix=/home/gac/gazebo2-pioneer/install
+prefix=/home/tiago/Untitled Folder 2/SistemasAutonomos/install
 
 Name: pioneer_2dnav
 Description: Description of pioneer_2dnav
 Version: 0.0.0
 Cflags: 
-Libs: -L/home/gac/gazebo2-pioneer/install/lib 
+Libs: -L/home/tiago/Untitled Folder 2/SistemasAutonomos/install/lib 
 Requires: 

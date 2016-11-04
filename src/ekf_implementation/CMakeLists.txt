@@ -1,10 +1,17 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(ekf_implementation)
 
+
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED)
+find_package(catkin REQUIRED COMPONENTS
+  nav_msgs
+  sensor_msgs
+  roscpp
+  rospy
+)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -63,7 +70,8 @@ find_package(catkin REQUIRED)
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
+#   nav_msgs  # Or other packages containing msgs
+#   sensor_msgs
 # )
 
 ################################################

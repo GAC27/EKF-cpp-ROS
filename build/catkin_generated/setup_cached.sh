@@ -7,4 +7,3 @@
 # new environment variables
 
 # modified environment variables
-export PWD="/home/gac/gazebo2-pioneer/build"

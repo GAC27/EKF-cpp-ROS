@@ -1,8 +1,8 @@
-prefix=/home/gac/gazebo2-pioneer/devel
+prefix=/home/tiago/Untitled Folder 2/SistemasAutonomos/devel
 
 Name: pioneer_gazebo
 Description: Description of pioneer_gazebo
 Version: 0.1.0
 Cflags: 
-Libs: -L/home/gac/gazebo2-pioneer/devel/lib 
+Libs: -L/home/tiago/Untitled Folder 2/SistemasAutonomos/devel/lib 
 Requires: 

@@ -1,0 +1,8 @@
+prefix=/home/tiago/Untitled Folder 2/SistemasAutonomos/install
+
+Name: ekf_implementation
+Description: Description of ekf_implementation
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/tiago/Untitled Folder 2/SistemasAutonomos/install/lib 
+Requires: 
