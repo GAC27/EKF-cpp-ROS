@@ -41,15 +41,65 @@ import rospy
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import LaserScan
 
+flag_active_odom = 0
+flag_active_base_scan = 0
+last_odom = 0
+last_base_scan = 0
+
 
 def odometryReceived(msg):
-    print msg.pose.pose
+     global last_odom 
+     last_odom = msg
+     global flag_active_odom 
+     flag_active_odom = True
 
 def BaseScanReceived(msg):
-    print msg    
+    global last_base_scan 
+    last_base_scan = msg
+    global flag_active_base_scan
+    flag_active_base_scan = True
 
-if __name__ == "__main__":
-    rospy.init_node('Subscriber_EKF', anonymous=True) #make node 
+def EKFprocess():
+	global flag_active_odom
+	global flag_active_base_scan
+	global last_odom
+	global last_base_scan
+	print last_odom
+	print "\n\n\n\n\n\n\n"
+	print last_base_scan
+	if(flag_active_odom and flag_active_base_scan):
+		pub_odom.publish(last_odom)
+		pub_base_scan.publish(last_base_scan)
+	
+
+def cleanFlags():
+	global flag_active_odom 
+	flag_active_odom = False
+	global flag_active_base_scan 
+	flag_active_odom = False
+
+
+
+def EKF():
+    rospy.init_node('EKF', anonymous=True) #make node 
     #rospy.Subscriber('odom',Odometry,odometryReceived)
-    rospy.Subscriber('base_scan',LaserScan,BaseScanReceived)
-    rospy.spin()
+    global pub_base_scan
+    pub_base_scan = rospy.Publisher("EKF_base_scan", LaserScan, queue_size=0)
+    global pub_odom
+    pub_odom = rospy.Publisher("EKF_odom", Odometry, queue_size=0)
+    global flag_active_odom
+    flag_active_odom = False
+    global flag_active_base_scan
+    flag_active_base_scan = False
+    while not rospy.is_shutdown():
+    	rospy.Subscriber('base_scan',LaserScan,BaseScanReceived)
+    	rospy.Subscriber('odom',Odometry,odometryReceived)
+
+    	EKFprocess()
+    	cleanFlags()
+
+if __name__ == '__main__':
+    try:
+        EKF()
+    except rospy.ROSInterruptException:
+        pass
