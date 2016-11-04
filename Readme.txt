@@ -59,3 +59,67 @@ pid="$pid $!"
 4- Created a custom Rviz view and changed pioneer_rviz.launch file --->
   <!-- Show in Rviz   -->
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find pioneer_description)/launch/CustomOnlyMapConfig.rviz"/>
+
+
+
+Real Robot instructions
+
+
+1º Go to the directory of the project
+
+Connect the robot
+
+2º . devel/setup.bash
+
+3º roscore
+
+4º sudo chmod 777 /dev/ttyUSB0
+
+5º rosrun rosaria RosAria
+
+
+
+The controls
+
+1º . devel/setup.bash
+
+2º rosrun teleop_keyobard_bla_bla telop_bla_bla.py
+
+
+
+
+The transform
+
+1º . devel/setup.bash
+
+2º rosrun rosaria transform
+
+
+
+The urg node
+
+1º . devel/setup.bash
+
+2º sudo chmod 777 /dev/ttyACM0
+
+3º rosrun urg_node urg_node
+
+
+
+Gmaping
+
+1º . devel/setup.bash
+
+2º rosrun gmapping slam_gmapping
+
+
+
+RVIZ
+
+
+1º . devel/setup.bash
+
+2º rviz rviz
+
+3º ADD topic map
+
