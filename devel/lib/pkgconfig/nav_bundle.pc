@@ -1,8 +1,8 @@
-prefix=/home/tiago/Untitled Folder 2/SistemasAutonomos/devel
+prefix=/home/gac/gazebo2-pioneer/devel
 
 Name: nav_bundle
 Description: Description of nav_bundle
 Version: 0.0.0
 Cflags: 
-Libs: -L/home/tiago/Untitled Folder 2/SistemasAutonomos/devel/lib 
+Libs: -L/home/gac/gazebo2-pioneer/devel/lib 
 Requires: 

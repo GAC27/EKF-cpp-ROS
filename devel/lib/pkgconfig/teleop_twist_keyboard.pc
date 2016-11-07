@@ -1,8 +1,8 @@
-prefix=/home/tiago/Untitled Folder 2/SistemasAutonomos/devel
+prefix=/home/gac/gazebo2-pioneer/devel
 
 Name: teleop_twist_keyboard
 Description: Description of teleop_twist_keyboard
 Version: 0.6.0
 Cflags: 
-Libs: -L/home/tiago/Untitled Folder 2/SistemasAutonomos/devel/lib 
+Libs: -L/home/gac/gazebo2-pioneer/devel/lib 
 Requires: 
