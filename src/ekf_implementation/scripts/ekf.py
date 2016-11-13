@@ -100,6 +100,10 @@ def EKFprocess(currentState):
         pub_base_scan.publish(current_base_scan)
         predictedState=getPredictedState(currentState,getPoseDifference(last_odom.pose.pose,current_odom.pose.pose))
         #Prediction(predictedState, covariance)
+        return predictedState
+    else:
+        return currentState
+
 
 
     
@@ -163,7 +167,6 @@ def F(Xk,Uk):
     orientationW=Xk.orientation.w + Uk[6]
 
     return State(posX,posY,posZ,orientationX,orientationY,orientationZ,orientationW)
-
 
 #Returns the error
 def V(Xk):
