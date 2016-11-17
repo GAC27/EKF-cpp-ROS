@@ -6,6 +6,7 @@
 #include <vector>
 #include "tf/transform_listener.h"
 #include "tf/transform_datatypes.h"
+#include <Eigen/Dense>
 /*#include "tf/transform_listener.h"
 #include "sensor_msgs/PointCloud.h"
 #include "tf/message_filter.h"
@@ -13,8 +14,9 @@
 #include "laser_geometry/laser_geometry.h"
 #include "tf/transform_datatypes.h"
 #include <math.h> 
-#include <Eigen/Dense>
 */
+
+using Eigen::MatrixXd;
 
 
 class State{
@@ -45,7 +47,7 @@ class State{
 };
 
 //Global Variables
-static ros::Time begin_time = ros::Time::now();
+//static ros::Time begin_time = ros::Time::now();
 static State* odom_data = NULL;
 //nav_msgs::Odometry::ConstPtr& scan_data;
 int counter_steps = 0;
@@ -126,7 +128,7 @@ int main(int argc, char **argv)
 
   ros::init(argc, argv, "ekf");   
   ros::NodeHandle n;
-  begin_time = ros::Time::now();   
+  //begin_time = ros::Time::now();   
   ros::Subscriber sub_odom = n.subscribe("odom", 1000, odom_receiver);
   //ros::Subscriber sub_scan = n.subscribe("base_scan", 1000, scan_receiver);
   //ros::Subscriber sub_map = n.subscribe("map", 1000, scan_receiver);
@@ -149,6 +151,14 @@ int main(int argc, char **argv)
 
     ROS_INFO("%s", msg.data.c_str());
 
+
+    MatrixXd m(2,2);
+    m(0,0) = 3;
+    m(1,0) = 2.5;
+    m(0,1) = -1;
+    m(1,1) = m(1,0) + m(0,1);
+    std::cout << m << std::endl;
+    std::cout << "End Matrix calculus" << std::endl;
 
     pub_new_estimates.publish(msg);
 

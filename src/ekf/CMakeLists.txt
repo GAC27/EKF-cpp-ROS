@@ -8,7 +8,16 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   roscpp
   rospy
+  angles
+  cmake_modules
+  roscpp
+  sensor_msgs
+  tf
+  tf2
 )
+
+find_package(Eigen REQUIRED)
+
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -99,12 +108,20 @@ find_package(catkin REQUIRED COMPONENTS
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
+#catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES ekf
 #  CATKIN_DEPENDS nav_msgs roscpp rospy
 #  DEPENDS system_lib
+#)
+
+
+catkin_package(
+  INCLUDE_DIRS include
+  LIBRARIES laser_geometry
+  DEPENDS Boost Eigen
 )
+
 
 ###########
 ## Build ##
@@ -112,9 +129,10 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-# include_directories(include)
-include_directories(
-  ${catkin_INCLUDE_DIRS}
+include_directories(include
+    ${catkin_INCLUDE_DIRS}
+    ${Boost_INCLUDE_DIRS}
+    ${Eigen_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
