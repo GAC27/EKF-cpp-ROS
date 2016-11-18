@@ -243,7 +243,9 @@ int main(int argc, char **argv)
   //begin_time = ros::Time::now();   
   ros::Subscriber sub_odom = n.subscribe("odom", 1000, odom_receiver);
   ros::Subscriber sub_scan = n.subscribe("base_scan", 1000, scan_receiver);
-  ros::Subscriber sub_map = n.subscribe("map", 1000, map_receiver);
+  //ros::Subscriber sub_map = n.subscribe("map", 1000, map_receiver);
+  ros::Subscriber sub_map = n.subscribe("/map_from_map_server", 1000, map_receiver);    //Has to subscribe to our moded_map_server topic in order to avoid rewriting the map
+
   ros::Publisher pub_new_estimates = n.advertise<std_msgs::String>("different_chatter", 1000);
 
   //ekf_step(sub_odom, sub_scan);
