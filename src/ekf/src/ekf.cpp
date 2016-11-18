@@ -1,5 +1,6 @@
 #include "ros/ros.h"
 #include "nav_msgs/Odometry.h"
+#include "nav_msgs/OccupancyGrid.h"
 #include "std_msgs/String.h"
 #include "ros/time.h"
 #include <sstream>
@@ -7,13 +8,14 @@
 #include "tf/transform_listener.h"
 #include "tf/transform_datatypes.h"
 #include <Eigen/Dense>
+#define _USE_MATH_DEFINES
+#include <math.h> 
 /*#include "tf/transform_listener.h"
 #include "sensor_msgs/PointCloud.h"
 #include "tf/message_filter.h"
 #include "message_filters/subscriber.h"
 #include "laser_geometry/laser_geometry.h"
 #include "tf/transform_datatypes.h"
-#include <math.h> 
 */
 
 using Eigen::MatrixXd;
@@ -47,12 +49,17 @@ class State{
 };
 
 //Global Variables
-//static ros::Time begin_time = ros::Time::now();
-static State* odom_data = NULL;
+//ros::Time* begin_time;
+State* odom_data = NULL;
 //nav_msgs::Odometry::ConstPtr& scan_data;
+nav_msgs::OccupancyGrid::ConstPtr occupancyGrid;
+MatrixXd noiseQk(3,3);
+MatrixXd covarianceK(3,3);
+MatrixXd map;
 int counter_steps = 0;
 State* prev_state = NULL;
 State* new_state = NULL;
+bool Map_Active=false;
 
 double get_theta(geometry_msgs::Quaternion q){
     return tf::getYaw(q);
@@ -70,20 +77,99 @@ State* f(State* state, const nav_msgs::Odometry::ConstPtr& msg, ros::Time time_n
   return new State(x,y,theta, time_now);  
 }
 
-std::vector<float> F(State prev_state, State new_state){
+MatrixXd F(State prev_state, State new_state){
   std::vector<float> v; 
   double delta_time = new_state.time_now.toSec() - prev_state.time_now.toSec();
   float vx = get_velocity(new_state.x, prev_state.x, delta_time);
   float vy = get_velocity(new_state.y, prev_state.y, delta_time);
   float theta = prev_state.theta;
   float x = (-sin(theta)* vx - cos(theta) * vy)* delta_time;
-  float y = (cos(theta) * vx + sin(theta) * vy) * delta_time;
-  v.push_back(x);
-  v.push_back(y);
-  v.push_back(theta);
-  return v;
+  float y = (cos(theta) * vx + sin(theta) * vy)* delta_time;
+  
+  MatrixXd m(3,3);
+  m(0,0) = 1;
+  m(0,1) = 0;
+  m(0,2) = 0;
+
+  m(1,0) = 0;
+  m(1,1) = 1;
+  m(1,2) = 0;
+
+  m(2,0) = x;
+  m(2,1) = y;
+  m(2,2) = 1;
+
+  return m;
 }
 
+
+MatrixXd Covariance(State prev_state, State new_state){
+  noiseQk(0,0) = 0.01;
+  noiseQk(0,1) = 0;
+  noiseQk(0,2) = 0;
+
+  noiseQk(1,0) = 0;
+  noiseQk(1,1) = 0.01;
+  noiseQk(1,2) = 0;
+
+  noiseQk(2,0) = 0;
+  noiseQk(2,1) = 0;
+  noiseQk(2,2) = 0.01;
+
+  MatrixXd jacobi=F(prev_state,new_state);
+  MatrixXd jacobiTransposed= jacobi.transpose();
+
+  return jacobi * covarianceK * jacobiTransposed + noiseQk;
+
+}
+
+
+/*Receives a matrix n x n and a state and calculates the expected laser scan 
+* The map data, in row-major order, starting with (0,0).  Occupancy
+* probabilities are in the range [0,100].  Unknown is -1. */
+float* raycast(State s){
+  //Parameters
+  float ang_incr= 1 * M_PI / 180;
+  float scan_ang= 180 * M_PI / 180;
+  float resolution= occupancyGrid->info.resolution;       //TODO adjust values
+  float max_range=0.25;       //TODO adjust values        
+
+  double number_rays= ceil(scan_ang/ang_incr) + 1; 
+  std::vector<float> scan;  
+
+  float ang_start = s.theta + scan_ang / 2;
+  float ang_end = s.theta - scan_ang / 2;
+  
+
+  float dist;
+  float ang;
+  float ind_x;
+  float ind_y;
+
+  for(int i = 1; i <= number_rays; i++){
+    dist = resolution;
+    ang= ang_start + (i-1)*ang_incr;
+
+    while(true){
+      ind_x = round(s.x + dist * cos(ang) * 100);
+      ind_y = round(s.y + dist * sin(ang) * 100);
+      if(dist > max_range){
+        scan.push_back(-1);   //I defined -1 as being the value for not found 
+        break;
+      }
+
+      if( map(ceil(ind_x), ceil(ind_y)) == 1){    //if found an obstacle with 100% certainty
+        scan.push_back(dist);
+      
+        break;
+      }
+      dist = dist + resolution;
+    }
+  } 
+
+  return &scan[0];
+
+}
 
 
 void ekf_step(const nav_msgs::Odometry::ConstPtr& msg_odom, ros::Time time_step){
@@ -99,27 +185,48 @@ void ekf_step(const nav_msgs::Odometry::ConstPtr& msg_odom, ros::Time time_step)
   {
     //prediction Step
     new_state = f(prev_state, msg_odom, time_step);
+    MatrixXd predictedCovariance = Covariance(*prev_state,*new_state);
+
+    float* predictedObservation = raycast(*new_state);
+
   }
 }
 
-/*
-void scan_receiver(const sensor_msgs::LaserScan::ConstPtr& msg)
-{
-  //TO DO: Base Scan 
+MatrixXd occupancyGridToMatrix(){
+  MatrixXd m(occupancyGrid->info.height, occupancyGrid->info.width);
+
+  for(int line=0; line < occupancyGrid->info.height; line++){
+    for(int column=0; column < occupancyGrid->info.width; column++){
+      m(line,column) = occupancyGrid->data[column + line * occupancyGrid->info.width];
+    }    
+  }
+
+  return m;
 }
-*/
 
 void odom_receiver(const nav_msgs::Odometry::ConstPtr& msg)
 {
-  printf("Seq: [%d]", msg->header.seq);
-  printf("Position-> x: [%f], y: [%f], z: [%f]", msg->pose.pose.position.x,msg->pose.pose.position.y, msg->pose.pose.position.z);
-  printf("Orientation-> x: [%f], y: [%f], z: [%f], w: [%f]", msg->pose.pose.orientation.x, msg->pose.pose.orientation.y, msg->pose.pose.orientation.z, msg->pose.pose.orientation.w);
-  printf("Vel-> Linear: [%f], Angular: [%f]", msg->twist.twist.linear.x,msg->twist.twist.angular.z);
+  //printf("Seq: [%d]", msg->header.seq);
+  //printf("Position-> x: [%f], y: [%f], z: [%f]", msg->pose.pose.position.x,msg->pose.pose.position.y, msg->pose.pose.position.z);
+  //printf("Orientation-> x: [%f], y: [%f], z: [%f], w: [%f]", msg->pose.pose.orientation.x, msg->pose.pose.orientation.y, msg->pose.pose.orientation.z, msg->pose.pose.orientation.w);
+  //printf("Vel-> Linear: [%f], Angular: [%f]", msg->twist.twist.linear.x,msg->twist.twist.angular.z);
   float x = msg->pose.pose.position.x;
   float y = msg->pose.pose.position.y;
   double theta = get_theta(msg->pose.pose.orientation);
   odom_data = new State(x,y,theta);
 }
+
+void map_receiver(const nav_msgs::OccupancyGrid::ConstPtr& msg){
+  
+  occupancyGrid = msg;
+  
+  map = occupancyGridToMatrix();
+
+  Map_Active=true;
+}
+
+
+
 
 
 
@@ -131,7 +238,7 @@ int main(int argc, char **argv)
   //begin_time = ros::Time::now();   
   ros::Subscriber sub_odom = n.subscribe("odom", 1000, odom_receiver);
   //ros::Subscriber sub_scan = n.subscribe("base_scan", 1000, scan_receiver);
-  //ros::Subscriber sub_map = n.subscribe("map", 1000, scan_receiver);
+  ros::Subscriber sub_map = n.subscribe("map", 1000, map_receiver);
   ros::Publisher pub_new_estimates = n.advertise<std_msgs::String>("different_chatter", 1000);
 
   //ekf_step(sub_odom, sub_scan);
@@ -142,16 +249,22 @@ int main(int argc, char **argv)
   int count = 0;
   while (ros::ok())
   {
-
+    
     std_msgs::String msg;
 
     std::stringstream ss;
     ss << "hello world " << count;
     msg.data = ss.str();
 
-    ROS_INFO("%s", msg.data.c_str());
-
-
+    if(Map_Active){
+      ROS_INFO("Map has been received");
+      printf("Seq: [%d]", occupancyGrid->header.seq);
+      printf("info: res= [%f] \n",occupancyGrid->info.resolution);
+      printf("Pose: x-> [%f]  y-> [%f]  z-> [%f]",occupancyGrid->info.origin.position.x,occupancyGrid->info.origin.position.y,occupancyGrid->info.origin.position.z);
+    }
+    //ROS_INFO("%s", msg.data.c_str());
+    
+    /*
     MatrixXd m(2,2);
     m(0,0) = 3;
     m(1,0) = 2.5;
@@ -159,6 +272,7 @@ int main(int argc, char **argv)
     m(1,1) = m(1,0) + m(0,1);
     std::cout << m << std::endl;
     std::cout << "End Matrix calculus" << std::endl;
+    */
 
     pub_new_estimates.publish(msg);
 
