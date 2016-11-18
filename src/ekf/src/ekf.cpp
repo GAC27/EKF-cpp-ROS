@@ -2,6 +2,7 @@
 #include "nav_msgs/Odometry.h"
 #include "nav_msgs/OccupancyGrid.h"
 #include "std_msgs/String.h"
+#include "sensor_msgs/LaserScan.h"
 #include "ros/time.h"
 #include <sstream>
 #include <vector>
@@ -129,10 +130,10 @@ MatrixXd Covariance(State prev_state, State new_state){
 * probabilities are in the range [0,100].  Unknown is -1. */
 float* raycast(State s){
   //Parameters
-  float ang_incr= 1 * M_PI / 180;
-  float scan_ang= 180 * M_PI / 180;
+  float ang_incr= 0.005814; //Taken from the laserScan topic
+  float scan_ang= 2.090000 * 2; //Taken from the laserScan topic
   float resolution= occupancyGrid->info.resolution;       //TODO adjust values
-  float max_range=0.25;       //TODO adjust values        
+  float max_range=5.600000;       //TODO adjust values        
 
   double number_rays= ceil(scan_ang/ang_incr) + 1; 
   std::vector<float> scan;  
@@ -225,6 +226,10 @@ void map_receiver(const nav_msgs::OccupancyGrid::ConstPtr& msg){
   Map_Active=true;
 }
 
+void scan_receiver(const sensor_msgs::LaserScan::ConstPtr& msg){
+  //printf("ang_min -> [%f]\n ang_max -> [%f]\nang_inc -> [%f]\nMax_range -> [%f]\n",msg->angle_min, msg->angle_max, msg->angle_increment, msg->range_max);
+}
+
 
 
 
@@ -237,7 +242,7 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
   //begin_time = ros::Time::now();   
   ros::Subscriber sub_odom = n.subscribe("odom", 1000, odom_receiver);
-  //ros::Subscriber sub_scan = n.subscribe("base_scan", 1000, scan_receiver);
+  ros::Subscriber sub_scan = n.subscribe("base_scan", 1000, scan_receiver);
   ros::Subscriber sub_map = n.subscribe("map", 1000, map_receiver);
   ros::Publisher pub_new_estimates = n.advertise<std_msgs::String>("different_chatter", 1000);
 
@@ -258,21 +263,13 @@ int main(int argc, char **argv)
 
     if(Map_Active){
       ROS_INFO("Map has been received");
-      printf("Seq: [%d]", occupancyGrid->header.seq);
-      printf("info: res= [%f] \n",occupancyGrid->info.resolution);
-      printf("Pose: x-> [%f]  y-> [%f]  z-> [%f]",occupancyGrid->info.origin.position.x,occupancyGrid->info.origin.position.y,occupancyGrid->info.origin.position.z);
+      //printf("Seq: [%d]", occupancyGrid->header.seq);
+      //printf("info: res= [%f] \n",occupancyGrid->info.resolution);
+      //printf("Pose: x-> [%f]  y-> [%f]  z-> [%f]",occupancyGrid->info.origin.position.x,occupancyGrid->info.origin.position.y,occupancyGrid->info.origin.position.z);
     }
     //ROS_INFO("%s", msg.data.c_str());
     
-    /*
-    MatrixXd m(2,2);
-    m(0,0) = 3;
-    m(1,0) = 2.5;
-    m(0,1) = -1;
-    m(1,1) = m(1,0) + m(0,1);
-    std::cout << m << std::endl;
-    std::cout << "End Matrix calculus" << std::endl;
-    */
+   
 
     pub_new_estimates.publish(msg);
 
