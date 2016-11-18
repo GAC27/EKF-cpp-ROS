@@ -152,14 +152,14 @@ float* raycast(State s){
     ang= ang_start + (i-1)*ang_incr;
 
     while(true){
-      ind_x = round(s.x + dist * cos(ang) * 100);
-      ind_y = round(s.y + dist * sin(ang) * 100);
+      ind_x = round(s.x + (occupancyGrid->info.width/2) + dist * cos(ang) * 100);
+      ind_y = round(s.y + (occupancyGrid->info.height/2) + dist * sin(ang) * 100);
       if(dist > max_range){
         scan.push_back(-1);   //I defined -1 as being the value for not found 
         break;
       }
 
-      if( map(ceil(ind_x), ceil(ind_y)) == 1){    //if found an obstacle with 100% certainty
+      if( map(ceil(ind_x), ceil(ind_y)) >= 70){    //if found an obstacle with 50% certainty
         scan.push_back(dist);
       
         break;
@@ -227,6 +227,18 @@ void map_receiver(const nav_msgs::OccupancyGrid::ConstPtr& msg){
 }
 
 void scan_receiver(const sensor_msgs::LaserScan::ConstPtr& msg){
+  if(Map_Active){
+    State *testState=new State(-20,-100,0);
+    
+    float* f=raycast(*testState);
+
+    for(int i=0; i<20;i++){
+      printf("raycast: (%d,%f)   | laser: (%d, %f)\n",i,f[i],i,msg->ranges[i]);
+      
+    }
+
+    printf("\n\n\n\n\n\n");
+  }
   //printf("ang_min -> [%f]\n ang_max -> [%f]\nang_inc -> [%f]\nMax_range -> [%f]\n",msg->angle_min, msg->angle_max, msg->angle_increment, msg->range_max);
 }
 
@@ -253,6 +265,8 @@ int main(int argc, char **argv)
 
   ros::Rate loop_rate(10);   
 
+  //State *testState=new State(-100,-100,1);
+
   int count = 0;
   while (ros::ok())
   {
@@ -265,6 +279,7 @@ int main(int argc, char **argv)
 
     if(Map_Active){
       ROS_INFO("Map has been received");
+      
       //printf("Seq: [%d]", occupancyGrid->header.seq);
       //printf("info: res= [%f] \n",occupancyGrid->info.resolution);
       //printf("Pose: x-> [%f]  y-> [%f]  z-> [%f]",occupancyGrid->info.origin.position.x,occupancyGrid->info.origin.position.y,occupancyGrid->info.origin.position.z);
