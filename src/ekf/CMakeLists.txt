@@ -12,8 +12,6 @@ find_package(catkin REQUIRED COMPONENTS
   cmake_modules
   roscpp
   sensor_msgs
-  tf
-  tf2
 )
 
 find_package(Eigen REQUIRED)
