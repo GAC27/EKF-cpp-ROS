@@ -128,48 +128,57 @@ MatrixXd Covariance(State prev_state, State new_state){
 /*Receives a matrix n x n and a state and calculates the expected laser scan 
 * The map data, in row-major order, starting with (0,0).  Occupancy
 * probabilities are in the range [0,100].  Unknown is -1. */
-float* raycast(State s){
+std::vector<float> raycast(State s){
   //Parameters
   float ang_incr= 0.005814; //Taken from the laserScan topic
   float scan_ang= 2.090000 * 2; //Taken from the laserScan topic
   float resolution= occupancyGrid->info.resolution;       //TODO adjust values
   float max_range=5.600000;       //TODO adjust values        
 
-  double number_rays= ceil(scan_ang/ang_incr) + 1; 
+  double number_rays= floor(scan_ang/ang_incr); 
   std::vector<float> scan;  
 
-  float ang_start = s.theta + scan_ang / 2;
-  float ang_end = s.theta - scan_ang / 2;
+  float ang_start = s.theta - scan_ang / 2;
+  float ang_end = s.theta + scan_ang / 2;
   
 
   float dist;
-  float ang;
+  float ang=ang_start;
   float ind_x;
   float ind_y;
 
-  for(int i = 1; i <= number_rays; i++){
-    dist = resolution;
-    ang= ang_start + (i-1)*ang_incr;
-
-    while(true){
-      ind_x = round(s.x + (occupancyGrid->info.width/2) + dist * cos(ang) * 100);
-      ind_y = round(s.y + (occupancyGrid->info.height/2) + dist * sin(ang) * 100);
-      if(dist > max_range){
-        scan.push_back(-1);   //I defined -1 as being the value for not found 
-        break;
-      }
-
-      if( map(ceil(ind_x), ceil(ind_y)) >= 70){    //if found an obstacle with 50% certainty
+  for(int i = 0; i < number_rays; i++){
+    dist=0;
+    ind_x = (unsigned int)((odom_data->x - occupancyGrid->info.origin.position.x) / occupancyGrid->info.resolution);
+    ind_y = (unsigned int)((odom_data->y - occupancyGrid->info.origin.position.y) / occupancyGrid->info.resolution);
+    
+    while(dist <= max_range){
+      if(map(ind_x,ind_y) >= 70){
         scan.push_back(dist);
-      
         break;
       }
+      ind_x = ind_x + cos(ang);
+      ind_y = ind_y + sin(ang);
       dist = dist + resolution;
     }
+    if(dist > max_range){
+      scan.push_back(-1);
+    }
+
+    ang += ang_incr; 
   } 
 
-  return &scan[0];
+  return scan;
 
+}
+
+std::vector<float> prediction(const nav_msgs::Odometry::ConstPtr& msg_odom, ros::Time time_step){
+  new_state = f(prev_state, msg_odom, time_step);
+  MatrixXd predictedCovariance = Covariance(*prev_state,*new_state);
+
+  std::vector<float> predictedObservation = raycast(*new_state);
+
+  return predictedObservation;
 }
 
 
@@ -185,13 +194,16 @@ void ekf_step(const nav_msgs::Odometry::ConstPtr& msg_odom, ros::Time time_step)
   else
   {
     //prediction Step
-    new_state = f(prev_state, msg_odom, time_step);
-    MatrixXd predictedCovariance = Covariance(*prev_state,*new_state);
+    std::vector<float> predictedObservation = prediction(msg_odom,time_step);
 
-    float* predictedObservation = raycast(*new_state);
+    //Matching Step
+
+    //Update Step
 
   }
 }
+
+
 
 MatrixXd occupancyGridToMatrix(){
   MatrixXd m(occupancyGrid->info.height, occupancyGrid->info.width);
@@ -201,6 +213,8 @@ MatrixXd occupancyGridToMatrix(){
       m(line,column) = occupancyGrid->data[column + line * occupancyGrid->info.width];
     }    
   }
+  
+  std::cout << "Map matrix size ---->" << m.rows() << "x" << m.cols() << std::endl;
 
   return m;
 }
@@ -228,9 +242,14 @@ void map_receiver(const nav_msgs::OccupancyGrid::ConstPtr& msg){
 
 void scan_receiver(const sensor_msgs::LaserScan::ConstPtr& msg){
   if(Map_Active){
-    State *testState=new State(-20,-100,0);
+    int grid_x = (unsigned int)((odom_data->x - occupancyGrid->info.origin.position.x) / occupancyGrid->info.resolution);
+    int grid_y = (unsigned int)((odom_data->y - occupancyGrid->info.origin.position.y) / occupancyGrid->info.resolution);
     
-    float* f=raycast(*testState);
+    State *testState=new State(grid_x,grid_y,0);
+    
+    printf("grid_x & y: [%d,%d]\n",grid_x,grid_y);
+
+    std::vector<float> f=raycast(*testState);
 
     for(int i=0; i<20;i++){
       printf("raycast: (%d,%f)   | laser: (%d, %f)\n",i,f[i],i,msg->ranges[i]);

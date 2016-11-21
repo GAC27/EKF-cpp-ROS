@@ -67,14 +67,14 @@ set(ekf_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("TRUE" STREQUAL "TRUE")
-  set(ekf_SOURCE_PREFIX /home/tiago/GitHub/SistemasAutonomos/src/ekf)
-  set(ekf_DEVEL_PREFIX /home/tiago/GitHub/SistemasAutonomos/devel)
+  set(ekf_SOURCE_PREFIX /home/gac/gazebo2-pioneer/src/ekf)
+  set(ekf_DEVEL_PREFIX /home/gac/gazebo2-pioneer/devel)
   set(ekf_INSTALL_PREFIX "")
   set(ekf_PREFIX ${ekf_DEVEL_PREFIX})
 else()
   set(ekf_SOURCE_PREFIX "")
   set(ekf_DEVEL_PREFIX "")
-  set(ekf_INSTALL_PREFIX /home/tiago/GitHub/SistemasAutonomos/install)
+  set(ekf_INSTALL_PREFIX /home/gac/gazebo2-pioneer/install)
   set(ekf_PREFIX ${ekf_INSTALL_PREFIX})
 endif()
 
@@ -91,9 +91,9 @@ endif()
 # flag project as catkin-based to distinguish if a find_package()-ed project is a catkin project
 set(ekf_FOUND_CATKIN_PROJECT TRUE)
 
-if(NOT "/home/tiago/GitHub/SistemasAutonomos/src/ekf/include;/usr/include/eigen3 " STREQUAL " ")
+if(NOT "/home/gac/gazebo2-pioneer/src/ekf/include;/usr/include/eigen3 " STREQUAL " ")
   set(ekf_INCLUDE_DIRS "")
-  set(_include_dirs "/home/tiago/GitHub/SistemasAutonomos/src/ekf/include;/usr/include/eigen3")
+  set(_include_dirs "/home/gac/gazebo2-pioneer/src/ekf/include;/usr/include/eigen3")
   foreach(idir ${_include_dirs})
     if(IS_ABSOLUTE ${idir} AND IS_DIRECTORY ${idir})
       set(include ${idir})
@@ -103,7 +103,7 @@ if(NOT "/home/tiago/GitHub/SistemasAutonomos/src/ekf/include;/usr/include/eigen3
         message(FATAL_ERROR "Project 'ekf' specifies '${idir}' as an include dir, which is not found.  It does not exist in '${include}'.  Ask the maintainer 'tiago <tiago@todo.todo>' to fix it.")
       endif()
     else()
-      message(FATAL_ERROR "Project 'ekf' specifies '${idir}' as an include dir, which is not found.  It does neither exist as an absolute directory nor in '/home/tiago/GitHub/SistemasAutonomos/src/ekf/${idir}'.  Ask the maintainer 'tiago <tiago@todo.todo>' to fix it.")
+      message(FATAL_ERROR "Project 'ekf' specifies '${idir}' as an include dir, which is not found.  It does neither exist as an absolute directory nor in '/home/gac/gazebo2-pioneer/src/ekf/${idir}'.  Ask the maintainer 'tiago <tiago@todo.todo>' to fix it.")
     endif()
     _list_append_unique(ekf_INCLUDE_DIRS ${include})
   endforeach()
@@ -122,7 +122,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/tiago/GitHub/SistemasAutonomos/devel/lib;/home/tiago/catkin_ws/devel/lib;/opt/ros/kinetic/lib)
+    foreach(path /home/gac/gazebo2-pioneer/devel/lib;/home/gac/gazebo2-pioneer/devel/lib;/opt/ros/kinetic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
