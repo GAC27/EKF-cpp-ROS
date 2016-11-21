@@ -240,6 +240,41 @@ void map_receiver(const nav_msgs::OccupancyGrid::ConstPtr& msg){
   Map_Active=true;
 }
 
+
+void transmit_laser_scan(std::vector<float> f, const sensor_msgs::LaserScan::ConstPtr& msg)
+{
+
+  ros::NodeHandle n;
+  ros::Publisher scan_pub = n.advertise<sensor_msgs::LaserScan>("bla_scan", 50);
+  
+
+  int count = 0;
+  ros::Rate r(1.0);
+  while(n.ok()){
+    //generate some fake data for our laser scan
+    ros::Time scan_time = ros::Time::now();
+
+    //populate the LaserScan message
+    sensor_msgs::LaserScan scan;
+    scan.header.stamp = scan_time;
+    scan.header.frame_id = "base_link";
+    scan.angle_min = msg->angle_min;
+    scan.angle_max = msg->angle_max;
+    scan.angle_increment = msg->angle_increment;
+    unsigned int num_readings = floor((scan.angle_max - scan.angle_min)/scan.angle_increment);
+    scan.time_increment = msg->time_increment;
+    scan.range_min = msg->range_min;
+    scan.range_max = msg->range_max;
+
+    scan.ranges.resize(num_readings);
+    scan.ranges = f;
+
+    scan_pub.publish(scan);
+    ++count;
+    r.sleep();
+  }
+}
+
 void scan_receiver(const sensor_msgs::LaserScan::ConstPtr& msg){
   if(Map_Active){
     int grid_x = (unsigned int)((odom_data->x - occupancyGrid->info.origin.position.x) / occupancyGrid->info.resolution);
@@ -250,6 +285,8 @@ void scan_receiver(const sensor_msgs::LaserScan::ConstPtr& msg){
     printf("grid_x & y: [%d,%d]\n",grid_x,grid_y);
 
     std::vector<float> f=raycast(*testState);
+
+    transmit_laser_scan(f, msg);
 
     for(int i=0; i<20;i++){
       printf("raycast: (%d,%f)   | laser: (%d, %f)\n",i,f[i],i,msg->ranges[i]);
