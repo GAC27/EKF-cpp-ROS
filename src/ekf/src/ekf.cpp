@@ -71,10 +71,10 @@ float get_velocity(float new_x, float prev_x, double delta_time){
   return distance / delta_time;
 }
 
-State* f(State* state, const nav_msgs::Odometry::ConstPtr& msg, ros::Time time_now){
-  float x = msg->pose.pose.position.x - state->x;
-  float y = msg->pose.pose.position.y - state->y;
-  float theta = get_theta(msg->pose.pose.orientation);
+State* f(State* prevState,State* odom_state, const nav_msgs::Odometry::ConstPtr& msg, ros::Time time_now){
+  float x = msg->pose.pose.position.x - odom_state->x + prevState->x;
+  float y = msg->pose.pose.position.y - odom_state->y + prevState->y;
+  float theta = get_theta(msg->pose.pose.orientation) - odom_state->theta + prevState->theta;
   return new State(x,y,theta, time_now);  
 }
 
@@ -89,15 +89,15 @@ MatrixXd F(State prev_state, State new_state){
   
   MatrixXd m(3,3);
   m(0,0) = 1;
-  m(0,1) = 0;
-  m(0,2) = 0;
-
   m(1,0) = 0;
-  m(1,1) = 1;
-  m(1,2) = 0;
+  m(2,0) = 0;
 
-  m(2,0) = x;
-  m(2,1) = y;
+  m(0,1) = 0;
+  m(1,1) = 1;
+  m(2,1) = 0;
+
+  m(0,2) = x;
+  m(1,2) = y;
   m(2,2) = 1;
 
   return m;
