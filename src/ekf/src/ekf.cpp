@@ -124,11 +124,61 @@ MatrixXd Covariance(State prev_state, State new_state){
 
 }
 
+MatrixXd h(std::vector<float> distances,State s){
+  float ang_incr= 0.005814; //Taken from the laserScan topic
+  float scan_ang= 2.090000 * 2; //Taken from the laserScan topic
+  float ang_start = s.theta - scan_ang / 2;
+  MatrixXd result(2,distances.size());
+  float fi;
+  for(int i =0 ; i < distances.size() ; i++){
+    fi=ang_start + ang_incr * i;
+    result(0,i) = distances[i];
+    result(1,i) = fi;
+  }
+  return result;
+}
+
+
+std::vector<MatrixXd> H(MatrixXd h, State s){
+  std::vector<MatrixXd> jacobi;
+  for(int i = 0 ; i < h.cols() ; i++){
+    MatrixXd m(2,3);
+    m(0,0) = -(cos(h(1,i)) * h(0,i)) / h(0,i);
+    m(0,1) = -(sin(h(1,i)) * h(0,i)) / h(0,i);
+    m(0,2) = 0;
+
+
+
+    m(1,0) = (sin(h(1,i)) * h(0,i)) / pow(h(0,i),2);
+    m(1,1) = -(cos(h(1,i)) * h(0,i)) / pow(h(0,i),2);
+    m(1,2) = -1;
+    jacobi.push_back(m);
+  }
+  return jacobi;
+}
+
+MatrixXd V(MatrixXd realZ, MatrixXd predictedZ){
+  MatrixXd innovation(realZ.rows(),realZ.cols());
+
+  for(int i = 0 ; i < realZ.cols() ; i++){
+    innovation(0,i) = realZ(0,i) - predictedZ(0,i);
+    innovation(1,i) = realZ(1,i) - predictedZ(1,i);
+  }
+
+  return innovation;
+}
+
+//With E[Vij(k+1)Vij(k+1)T]
+
+
 
 /*Receives a matrix n x n and a state and calculates the expected laser scan 
 * The map data, in row-major order, starting with (0,0).  Occupancy
 * probabilities are in the range [0,100].  Unknown is -1. */
 std::vector<float> raycast(State s){
+  int grid_x = (unsigned int)((s.x - occupancyGrid->info.origin.position.x) / occupancyGrid->info.resolution);
+  int grid_y = (unsigned int)((s.y - occupancyGrid->info.origin.position.y) / occupancyGrid->info.resolution);
+
   //Parameters
   float ang_incr= 0.005814; //Taken from the laserScan topic
   float scan_ang= 2.090000 * 2; //Taken from the laserScan topic
@@ -281,15 +331,12 @@ void transmit_laser_scan(std::vector<float> f, const sensor_msgs::LaserScan::Con
 
 void scan_receiver(const sensor_msgs::LaserScan::ConstPtr& msg){
   if(Map_Active){
-    int grid_x = (unsigned int)((odom_data->x - occupancyGrid->info.origin.position.x) / occupancyGrid->info.resolution);
-    int grid_y = (unsigned int)((odom_data->y - occupancyGrid->info.origin.position.y) / occupancyGrid->info.resolution);
     
-
-    State *testState=new State(grid_x,grid_y,odom_data->theta);
+    //State *testState=new State(grid_x,grid_y,odom_data->theta);
     
-    printf("grid_x & y: [%d,%d]\n",grid_x,grid_y);
+    //printf("grid_x & y: [%d,%d]\n",grid_x,grid_y);
 
-    std::vector<float> f=raycast(*testState);
+    std::vector<float> f=raycast(*odom_data);
 
     transmit_laser_scan(f, msg);
 
