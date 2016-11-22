@@ -133,7 +133,7 @@ std::vector<float> raycast(State s){
   float ang_incr= 0.005814; //Taken from the laserScan topic
   float scan_ang= 2.090000 * 2; //Taken from the laserScan topic
   float resolution= occupancyGrid->info.resolution;       //TODO adjust values
-  float max_range=5.600000;       //TODO adjust values        
+  float max_range=15.600000;       //TODO adjust values        
 
   double number_rays= floor(scan_ang/ang_incr); 
   std::vector<float> scan;  
@@ -148,12 +148,16 @@ std::vector<float> raycast(State s){
   float ind_y;
 
   for(int i = 0; i < number_rays; i++){
-    dist=0;
+    dist=0 - 0.125; // 0.125 is the distance between the center of the robot and the laser's positon
     ind_x = (unsigned int)((odom_data->x - occupancyGrid->info.origin.position.x) / occupancyGrid->info.resolution);
     ind_y = (unsigned int)((odom_data->y - occupancyGrid->info.origin.position.y) / occupancyGrid->info.resolution);
     
     while(dist <= max_range){
-      if(map(ind_x,ind_y) >= 70){
+      if(ind_x < 0 || ind_x >= map.rows() || ind_y < 0 || ind_y >= map.cols()){
+        dist = max_range + 1;
+        break;
+      }
+      else if(map(ind_y,ind_x) >= 70){
         scan.push_back(dist);
         break;
       }
@@ -257,7 +261,7 @@ void transmit_laser_scan(std::vector<float> f, const sensor_msgs::LaserScan::Con
     //populate the LaserScan message
     sensor_msgs::LaserScan scan;
     scan.header.stamp = scan_time;
-    scan.header.frame_id = "base_link";
+    scan.header.frame_id = "laser";
     scan.angle_min = msg->angle_min;
     scan.angle_max = msg->angle_max;
     scan.angle_increment = msg->angle_increment;
@@ -280,7 +284,8 @@ void scan_receiver(const sensor_msgs::LaserScan::ConstPtr& msg){
     int grid_x = (unsigned int)((odom_data->x - occupancyGrid->info.origin.position.x) / occupancyGrid->info.resolution);
     int grid_y = (unsigned int)((odom_data->y - occupancyGrid->info.origin.position.y) / occupancyGrid->info.resolution);
     
-    State *testState=new State(grid_x,grid_y,0);
+
+    State *testState=new State(grid_x,grid_y,odom_data->theta);
     
     printf("grid_x & y: [%d,%d]\n",grid_x,grid_y);
 
