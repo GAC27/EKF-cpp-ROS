@@ -51,7 +51,7 @@ class State{
 
 //Global Variables
 //ros::Time* begin_time;
-State* odom_data = NULL;
+State* prev_odom = NULL;
 //nav_msgs::Odometry::ConstPtr& scan_data;
 nav_msgs::OccupancyGrid::ConstPtr occupancyGrid;
 MatrixXd noiseQk(3,3);
@@ -199,8 +199,8 @@ std::vector<float> raycast(State s){
 
   for(int i = 0; i < number_rays; i++){
     dist=0 - 0.125; // 0.125 is the distance between the center of the robot and the laser's positon
-    ind_x = (unsigned int)((odom_data->x - occupancyGrid->info.origin.position.x) / occupancyGrid->info.resolution);
-    ind_y = (unsigned int)((odom_data->y - occupancyGrid->info.origin.position.y) / occupancyGrid->info.resolution);
+    ind_x = (unsigned int)((prev_odom->x - occupancyGrid->info.origin.position.x) / occupancyGrid->info.resolution);
+    ind_y = (unsigned int)((prev_odom->y - occupancyGrid->info.origin.position.y) / occupancyGrid->info.resolution);
     
     while(dist <= max_range){
       if(ind_x < 0 || ind_x >= map.rows() || ind_y < 0 || ind_y >= map.cols()){
@@ -226,13 +226,39 @@ std::vector<float> raycast(State s){
 
 }
 
-std::vector<float> prediction(const nav_msgs::Odometry::ConstPtr& msg_odom, ros::Time time_step){
-  new_state = f(prev_state, msg_odom, time_step);
+MatrixXd prediction(const nav_msgs::Odometry::ConstPtr& msg_odom, ros::Time time_step){
+  new_state = f(prev_state,prev_odom, msg_odom, time_step);
   MatrixXd predictedCovariance = Covariance(*prev_state,*new_state);
 
   std::vector<float> predictedObservation = raycast(*new_state);
 
-  return predictedObservation;
+  MatrixXd _h = h(predictedObservation, *new_state);
+
+
+  return _h;
+}
+
+/*
+State* update(State* new_state, double kalman_Gain, MatrixXd realZ, MatrixXd predictedZ){
+  State* updatedState= new
+}
+*/
+
+
+//Kalman Gain
+//Shouldn't it be a scalar?
+MatrixXd KkplusOne(MatrixXd CovarianceKplusOne,MatrixXd H,MatrixXd S_KplusOne){
+
+  MatrixXd _KkplusOne=CovarianceKplusOne * H.transpose() * S_KplusOne.inverse();
+
+  return _KkplusOne;
+}
+
+
+MatrixXd S_KplusOne(MatrixXd H, MatrixXd CovarianceKplusOne /*, double RKplusOne*/){
+  MatrixXd  _S_KplusOne = H * CovarianceKplusOne * H.transpose() /*+ RKplusOne*/;
+
+  return _S_KplusOne;
 }
 
 
@@ -248,7 +274,7 @@ void ekf_step(const nav_msgs::Odometry::ConstPtr& msg_odom, ros::Time time_step)
   else
   {
     //prediction Step
-    std::vector<float> predictedObservation = prediction(msg_odom,time_step);
+    MatrixXd predictedZ  = prediction(msg_odom,time_step);
 
     //Matching Step
 
@@ -282,7 +308,7 @@ void odom_receiver(const nav_msgs::Odometry::ConstPtr& msg)
   float x = msg->pose.pose.position.x;
   float y = msg->pose.pose.position.y;
   double theta = get_theta(msg->pose.pose.orientation);
-  odom_data = new State(x,y,theta);
+  prev_odom = new State(x,y,theta);
 }
 
 void map_receiver(const nav_msgs::OccupancyGrid::ConstPtr& msg){
@@ -332,11 +358,11 @@ void transmit_laser_scan(std::vector<float> f, const sensor_msgs::LaserScan::Con
 void scan_receiver(const sensor_msgs::LaserScan::ConstPtr& msg){
   if(Map_Active){
     
-    //State *testState=new State(grid_x,grid_y,odom_data->theta);
+    //State *testState=new State(grid_x,grid_y,prev_odom->theta);
     
     //printf("grid_x & y: [%d,%d]\n",grid_x,grid_y);
 
-    std::vector<float> f=raycast(*odom_data);
+    std::vector<float> f=raycast(*prev_odom);
 
     transmit_laser_scan(f, msg);
 
