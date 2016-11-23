@@ -34,12 +34,21 @@ class State{
       this->theta = theta;
       this->time_now = time_now;
     } 
+
     State(float x, float y, float theta)
     {
       this->x = x;
       this->y = y;
       this->theta = theta;
     } 
+
+    State(MatrixXd stateVector)
+    {
+      this->x = stateVector(0,0);
+      this->y = stateVector(1,0);
+      this->theta = stateVector(2,0);
+    } 
+
     std::vector<float> state_vector(){
       std::vector<float> vec;
       vec.push_back(x);
@@ -47,6 +56,15 @@ class State{
       vec.push_back(theta);
       return vec;
     }
+
+    MatrixXd stateToMatrix(){
+      MatrixXd vec(3,1);
+      vec(0,0) = x;
+      vec(1,0) = y;
+      vec(2,0) = theta;
+      return vec;
+    }
+
 };
 
 //Global Variables
@@ -158,11 +176,11 @@ std::vector<MatrixXd> H(MatrixXd h, State s){
 }
 
 MatrixXd V(MatrixXd realZ, MatrixXd predictedZ){
-  MatrixXd innovation(realZ.rows(),realZ.cols());
+  MatrixXd innovation(realZ.rows() * realZ.cols(), 1);
 
   for(int i = 0 ; i < realZ.cols() ; i++){
-    innovation(0,i) = realZ(0,i) - predictedZ(0,i);
-    innovation(1,i) = realZ(1,i) - predictedZ(1,i);
+    innovation(i*2,0) = realZ(0,i) - predictedZ(0,i);
+    innovation(i*2 + 1,0) = realZ(1,i) - predictedZ(1,i);
   }
 
   return innovation;
@@ -238,18 +256,32 @@ MatrixXd prediction(const nav_msgs::Odometry::ConstPtr& msg_odom, ros::Time time
   return _h;
 }
 
-/*
-State* update(State* new_state, double kalman_Gain, MatrixXd realZ, MatrixXd predictedZ){
-  State* updatedState= new
+
+State* update(State* new_state, MatrixXd kalman_Gain, MatrixXd V_matrix){
+  MatrixXd real_kalman_Gain = MatrixXd(3,V_matrix.rows());
+  for(int i=0; i < V_matrix.cols();i+2)
+  {
+    real_kalman_Gain(0,i) = kalman_Gain(0,0);
+    real_kalman_Gain(1,i) = kalman_Gain(1,0);
+    real_kalman_Gain(2,i) = kalman_Gain(2,0);
+    real_kalman_Gain(0,i+1) = kalman_Gain(0,1);
+    real_kalman_Gain(1,i+1) = kalman_Gain(1,1);
+    real_kalman_Gain(2,i+1) = kalman_Gain(2,1); 
+  }
+
+  MatrixXd _update =new_state->stateToMatrix() + kalman_Gain * V_matrix;
+
+  State* updatedState= new State(_update);
+
+  return updatedState;
 }
-*/
+
 
 
 //Kalman Gain
-//Shouldn't it be a scalar?
 MatrixXd KkplusOne(MatrixXd CovarianceKplusOne,MatrixXd H,MatrixXd S_KplusOne){
 
-  MatrixXd _KkplusOne=CovarianceKplusOne * H.transpose() * S_KplusOne.inverse();
+  MatrixXd _KkplusOne = CovarianceKplusOne * H.transpose() * S_KplusOne.inverse();
 
   return _KkplusOne;
 }
