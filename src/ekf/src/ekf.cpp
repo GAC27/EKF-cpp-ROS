@@ -76,9 +76,9 @@ State* current_odom = NULL;
 nav_msgs::OccupancyGrid::ConstPtr occupancyGrid;
 sensor_msgs::LaserScan::ConstPtr scan;
 
-MatrixXd noiseQk(3,3);
-MatrixXd Covariance_KplusOne(3,3);
-MatrixXd Covariance_K(3,3);
+MatrixXd noiseQk = MatrixXd::Zero(3,3);
+MatrixXd Covariance_KplusOne = MatrixXd::Zero(3,3);
+MatrixXd Covariance_K = MatrixXd::Zero(3,3);
 MatrixXd map;
 
 int counter_steps = 0;
@@ -100,6 +100,10 @@ float get_velocity(float new_x, float prev_x, double delta_time){
 }
 
 State* f(State* prevState,State* odomState, State* currentOdom, ros::Time time_now){
+  //std::cout << "delta_X->" << currentOdom->x - odomState->x << std::endl;
+  //std::cout << "delta_Y->" << currentOdom->y - odomState->y << std::endl;
+  //std::cout << "delta_thetas->" << currentOdom->theta - odomState->theta << std::endl;
+
   float x = currentOdom->x - odomState->x + prevState->x;
   float y = currentOdom->y - odomState->y + prevState->y;
   float theta = currentOdom->theta - odomState->theta + prevState->theta;
@@ -107,7 +111,7 @@ State* f(State* prevState,State* odomState, State* currentOdom, ros::Time time_n
 }
 
 MatrixXd F(State prev_state, State new_state){
-  std::vector<float> v; 
+  /*std::vector<float> v; 
   double delta_time = new_state.time_now.toSec() - prev_state.time_now.toSec();
   float vx = get_velocity(new_state.x, prev_state.x, delta_time);
   float vy = get_velocity(new_state.y, prev_state.y, delta_time);
@@ -127,6 +131,20 @@ MatrixXd F(State prev_state, State new_state){
   m(0,2) = x;
   m(1,2) = y;
   m(2,2) = 1;
+  */  
+  MatrixXd m(3,3);
+  m(0,0) = 1;
+  m(1,0) = 0;
+  m(2,0) = 0;
+
+  m(0,1) = 0;
+  m(1,1) = 1;
+  m(2,1) = 0;
+
+  m(0,2) = 0;
+  m(1,2) = 0;
+  m(2,2) = 1;
+  
 
   return m;
 }
@@ -134,17 +152,17 @@ MatrixXd F(State prev_state, State new_state){
 
 MatrixXd PredictedCovariance(/*MatrixXd covarianceK,*/ State prev_state, State new_state){
 
-  noiseQk(0,0) = 0.01;
+  noiseQk(0,0) = 0.5;
   noiseQk(0,1) = 0;
   noiseQk(0,2) = 0;
 
   noiseQk(1,0) = 0;
-  noiseQk(1,1) = 0.01;
+  noiseQk(1,1) = 0.5;
   noiseQk(1,2) = 0;
 
   noiseQk(2,0) = 0;
   noiseQk(2,1) = 0;
-  noiseQk(2,2) = 0.01;
+  noiseQk(2,2) = 0.5;
   //printf("Nose done\n");
   MatrixXd jacobi = F(prev_state,new_state);
   //printf("F\n");  
@@ -164,9 +182,9 @@ MatrixXd PredictedCovariance(/*MatrixXd covarianceK,*/ State prev_state, State n
 
 
 MatrixXd UpdateCovariance(MatrixXd PredictedCovariance, MatrixXd Kalman_gain, std::vector<MatrixXd> _S_KplusOne){
-  MatrixXd diagonal_S_KplusOne(2 * _S_KplusOne.size() ,2 * _S_KplusOne.size());
+  MatrixXd diagonal_S_KplusOne = MatrixXd::Zero(2 * _S_KplusOne.size() ,2 * _S_KplusOne.size());
 
-  std::cout << "Created stacked Matrix" << std::endl;
+  //std::cout << "Created stacked Matrix" << std::endl;
 
 
   for(int i=0; i < _S_KplusOne.size(); i++){
@@ -177,13 +195,13 @@ MatrixXd UpdateCovariance(MatrixXd PredictedCovariance, MatrixXd Kalman_gain, st
   }
 
 
-  std::cout << "put stuff in stacked Matrix" << std::endl;
+  //std::cout << "put stuff in stacked Matrix" << std::endl;
 
-  std::cout << "PredictedCovariance lines ->" << PredictedCovariance.rows() << " cols->" << PredictedCovariance.cols() << std::endl;
+  //std::cout << "PredictedCovariance lines ->" << PredictedCovariance.rows() << " cols->" << PredictedCovariance.cols() << std::endl;
 
-  std::cout << "Kalman_gain lines ->" << Kalman_gain.rows() << " cols->" << Kalman_gain.cols() << std::endl;
+ // std::cout << "Kalman_gain lines ->" << Kalman_gain.rows() << " cols->" << Kalman_gain.cols() << std::endl;
 
-  std::cout << "diagonal_S_KplusOne lines ->" << diagonal_S_KplusOne.rows() << " cols->" << diagonal_S_KplusOne.cols() << std::endl;
+  //std::cout << "diagonal_S_KplusOne lines ->" << diagonal_S_KplusOne.rows() << " cols->" << diagonal_S_KplusOne.cols() << std::endl;
 
 
 
@@ -191,24 +209,34 @@ MatrixXd UpdateCovariance(MatrixXd PredictedCovariance, MatrixXd Kalman_gain, st
 }
 
 
-MatrixXd h(std::vector<float> distances,float theta, bool thetaIsStart){
+MatrixXd h(std::vector<float> distances,float theta/*, bool thetaIsStart*/){
   float ang_incr= 0.005814; //Taken from the laserScan topic
   float scan_ang= 2.090000 * 2; //Taken from the laserScan topic
+  //float ang_incr= scan_ang/3; //Taken from the laserScan topic
+  
   float ang_start;
-
+/*
   if(thetaIsStart){
     ang_start = theta;
+    std::cout << "theta Is Start: " << ang_start<<std::endl;
   }
   else{
     ang_start = theta - scan_ang / 2; 
-  }
+    std::cout << "theta Is not Start: " << theta<<std::endl;
 
-  MatrixXd result(2,distances.size());
+  }
+*/
+  //MatrixXd result(2,distances.size());
+  MatrixXd result = MatrixXd::Zero(2,3);
   float fi;
-  for(int i =0 ; i < distances.size() ; i++){
+  int i=0;
+  int j=0;
+  for(; i < distances.size() ; i+= (distances.size()/ 2) - 1, j++){
+    //std::cout << "J is:" << j << std::endl;
+    //std::cout << "I is:" << i << std::endl;
     fi=ang_start + ang_incr * i;
-    result(0,i) = distances[i];
-    result(1,i) = fi;
+    result(0,j) = distances[floor(i)];
+    result(1,j) = fi;
   }
   return result;
 }
@@ -239,7 +267,7 @@ std::vector<MatrixXd> H(MatrixXd h, State s){
 MatrixXd V(MatrixXd _realZ, MatrixXd _predictedZ){
   //std::cout << "Enter V" << std::endl;
   
-  MatrixXd innovation(2 * _realZ.cols(), 1);
+  MatrixXd innovation =MatrixXd::Zero(2 * _realZ.cols(), 1);
 
   //std::cout << "Created Innovation" << std::endl;
   for(int i = 0 ; i < _realZ.cols() ; i++){
@@ -319,8 +347,9 @@ std::vector<float> raycast(State s){
 
 MatrixXd prediction(ros::Time time_step){
 
-  std::cout << "State:" << prev_state->x << " " << prev_state->y << " " << prev_state->theta << std::endl;
-  printf("pre-f\n");
+  //std::cout << "State:" << prev_state->x << " " << prev_state->y << " " << prev_state->theta << std::endl;
+  //printf("pre-f\n");
+
 
   new_state = f(prev_state,prev_odom, current_odom, time_step);
 
@@ -331,9 +360,10 @@ MatrixXd prediction(ros::Time time_step){
   //printf("post-Covariance\n");
   std::vector<float> predictedObservation = raycast(*new_state);
 
-  //printf("post-Covariance\n");
-  MatrixXd predictedZ = h(predictedObservation, new_state->theta,false);
-  //printf("predictedZ\n");
+ // printf("post-Covariance\n");
+  MatrixXd predictedZ = h(predictedObservation, new_state->theta);
+  realZ = h(scan->ranges, current_odom->theta);
+ // printf("predictedZ\n");
   
 
   return predictedZ;
@@ -342,20 +372,20 @@ MatrixXd prediction(ros::Time time_step){
 
 State* update(State* new_state, MatrixXd kalman_Gain, MatrixXd V_matrix, std::vector<MatrixXd> SKplusOne){
 
-  std::cout << "Start Update" << std::endl;
+  //std::cout << "Start Update" << std::endl;
 
   MatrixXd _update =new_state->stateToMatrix() + kalman_Gain * V_matrix;
 
-  std::cout << "First Middle Update" << std::endl;
+  //std::cout << "First Middle Update" << std::endl;
 
 
   Covariance_K = UpdateCovariance( Covariance_KplusOne, kalman_Gain, SKplusOne);
 
-  std::cout << "Middle Update" << std::endl;
+  //std::cout << "Middle Update" << std::endl;
 
   State* updatedState= new State(_update);
 
-  std::cout << "End Update" << std::endl;
+  //std::cout << "End Update" << std::endl;
 
   return updatedState;
 }
@@ -365,39 +395,58 @@ State* update(State* new_state, MatrixXd kalman_Gain, MatrixXd V_matrix, std::ve
 //Kalman Gain
 MatrixXd KkplusOne(MatrixXd CovarianceKplusOne,std::vector<MatrixXd> H,std::vector<MatrixXd> S_KplusOne){
   
-  std::cout << "KkplusOne Inicio" << std::endl;
-  
-  MatrixXd real_kalman_Gain(3,H.size()*2);
+  //std::cout << "KkplusOne Inicio" << std::endl;
 
   int H_size = H.size();
   
-  std::cout << "Begin For KkplusOne" << std::endl;
-
-  for(int i=0; i< H_size; i++){
-    _KkplusOnei = CovarianceKplusOne * H[i].transpose() * S_KplusOne[i].inverse();
-    std::cout << "KkplusOne Covariance" << std::endl;
-
-    real_kalman_Gain(0,i*2) = _KkplusOnei(0,0);
-    real_kalman_Gain(1,i*2) = _KkplusOnei(1,0);
-    real_kalman_Gain(2,i*2) = _KkplusOnei(2,0);
-    real_kalman_Gain(0,i*2+1) = _KkplusOnei(0,1);
-    real_kalman_Gain(1,i*2+1) = _KkplusOnei(1,1);
-    real_kalman_Gain(2,i*2+1) = _KkplusOnei(2,1);
-    std::cout << "KkplusOne Covariance end" << std::endl; 
-  }
   
-  std::cout << "KkplusOne end" << std::endl;
+  MatrixXd stacked_H = MatrixXd::Zero(H_size * 2, 3);
+
+  MatrixXd diagonal_S_KplusOne = MatrixXd::Zero(H_size * 2 , H_size * 2);
+
+  MatrixXd real_kalman_Gain = MatrixXd::Zero(3,H_size*2);
+
+
+  for(int i=0; i < H_size; i++){
+    stacked_H(i*2, 0)=H[i](0,0);
+    stacked_H(i*2, 1)=H[i](0,1);
+    stacked_H(i*2 + 1, 0)=H[i](1,0);
+    stacked_H(i*2 + 1, 1)=H[i](1,1);
+  }
+
+
+ // std::cout << "S: \n" << diagonal_S_KplusOne << std::endl;
+
+  for(int i=0; i < H_size; i++){
+    diagonal_S_KplusOne(i*2,i*2)=S_KplusOne[i](0,0);
+    diagonal_S_KplusOne(i*2,i*2 + 1)=S_KplusOne[i](0,1);
+    diagonal_S_KplusOne(i*2 + 1,i*2)=S_KplusOne[i](1,0);
+    diagonal_S_KplusOne(i*2 + 1,i*2 +1)=S_KplusOne[i](1,1);
+  }
+
+ // std::cout << "Begin For KkplusOne" << std::endl;
+  
+ // std::cout << "S: \n" << diagonal_S_KplusOne << std::endl;
+ // std::cout << "Inverse S: \n" << diagonal_S_KplusOne.inverse() << std::endl;
+
+  real_kalman_Gain = CovarianceKplusOne * stacked_H.transpose() * diagonal_S_KplusOne.inverse();
+  
+ // std::cout << "KkplusOne end" << std::endl;
 
   return real_kalman_Gain;
 }
 
 
-std::vector<MatrixXd> S_KplusOne(std::vector<MatrixXd> H, MatrixXd CovarianceKplusOne /*, double RKplusOne*/){
+std::vector<MatrixXd> S_KplusOne(std::vector<MatrixXd> H, MatrixXd CovarianceKplusOne ){
   
   std::vector<MatrixXd> _S_KplusOne;
+  MatrixXd Rk(2,2);
+  Rk << 0.5, 0,
+        0,    0.5;
+
   for(int i=0; i < H.size(); i++){
     //std::cout << Hi << std::endl;
-    _S_KplusOne.push_back(H[i] * CovarianceKplusOne * H[i].transpose() /*+ RKplusOne*/);  
+    _S_KplusOne.push_back(H[i] * CovarianceKplusOne * H[i].transpose() + Rk);  
   }
   
 
@@ -405,47 +454,115 @@ std::vector<MatrixXd> S_KplusOne(std::vector<MatrixXd> H, MatrixXd CovarianceKpl
 }
 
 
+std::vector<int> matching(std::vector<MatrixXd> S_KplusOne, MatrixXd _V){
+  //TODO Change GAMA
+  int Gama = 50;
+  std::vector<int> index_to_include;
+  MatrixXd vij(2,1);
+  for(int i=0; i < _V.rows() / 2; i++){
+    vij(0,0) = _V(i,0);
+    vij(1,0) = _V(i+1,0);
+    MatrixXd val = vij.transpose() * S_KplusOne[i] * vij; 
+    if(val(0,0) <= Gama){
+      index_to_include.push_back(i);
+    }
+  }
+  return index_to_include;
+}
+
+
+
+
+
 void ekf_step(ros::Time time_step){
   //init in first step
   if(counter_steps == 0)
   {
-    //printf("First Step\n");
+   // printf("First Step\n");
     float x = current_odom->x;
     float y = current_odom->y;
     float theta = current_odom->theta;
     prev_state = new State(x,y,theta, time_step);
     prev_odom = new State(x,y,theta,time_step);
-    Covariance_KplusOne << 1, 0, 0,
-                           0, 1, 0,
-                           0, 0, 1;
-    //printf("First Step\n");
+    Covariance_K << 1, 0, 0,
+                    0, 1, 0,
+                    0, 0, 1;
+    //printf("First Step\n"); 
+
   }
   else
   {
+    //std::cout <<"Covariance_KplusOne: " << Covariance_KplusOne << std::endl;
+
+    //std::cout <<"Covariance_K: " << Covariance_K << std::endl;
 
     //Prediction Step
-    //printf("pre-prediction\n");
+   // printf("pre-prediction\n");
     MatrixXd predictedZ  = prediction(time_step);
+    
+   // std::cout <<"predictedZ: " << predictedZ << std::endl;
+
     //printf("pos-prediction\n");
     std::vector<MatrixXd> _H = H(predictedZ,*new_state);
+
+    /*for(int i = 0; i < _H.size(); i++){
+      std::cout <<"_H[" << i << "]: " << _H[i] << std::endl;
+    }*/
+
     //printf("H\n");  
     std::vector<MatrixXd> SKplusOne = S_KplusOne( _H, Covariance_KplusOne /* RKplusOne*/);
-    //printf("S_KplusOne\n");
+
+  /*  for(int i = 0; i < SKplusOne.size(); i++){
+      std::cout <<"SKplusOne[" << i << "]: " << SKplusOne[i] << std::endl;
+    }*/
+   // printf("S_KplusOne\n");
     //Matching Step
+   // std::cout << "realZ:" << realZ << std::endl;
+   // std::cout << "predictedZ:" << predictedZ << std::endl;
+
     MatrixXd _V = V(realZ, predictedZ); //Who you gonna call? MATH DUDE! How do we accept the value??
-    //printf("V\n");
+    
+
+    std::vector<int> index_to_include = matching(SKplusOne, _V);
+
+    std::vector<MatrixXd> _H_copy;
+    std::vector<MatrixXd> SKplusOne_copy;
+    MatrixXd _V_copy(index_to_include.size()*2, 1);
+
+    for(int i=0; i < index_to_include.size(); i++){
+      int j = index_to_include[i];
+      _H_copy.push_back(_H[j]);
+      SKplusOne_copy.push_back(SKplusOne[j]);
+      _V_copy(i*2,0) = _V(j*2,0);
+      _V_copy(i*2 +1,0) = _V(j*2 +1,0);
+    }
+
+    _H = _H_copy;
+    SKplusOne = SKplusOne_copy;
+    _V = _V_copy;
+
+   // std::cout <<"_V: " << _V << std::endl;
+
+
+   // printf("V\n");
+
+  //  std::cout <<"Kalman_gain: " << KkplusOne(Covariance_KplusOne, _H, SKplusOne) << std::endl;
+
+
     //Update Step
     prev_state=update(new_state,KkplusOne(Covariance_KplusOne, _H, SKplusOne), _V, SKplusOne);
-    //printf("update\n");
+
+
+   // printf("update\n");
     prev_odom=current_odom;
-    //printf("prev_odom\n");
+  //  printf("prev_odom\n");
   }
 }
 
 
 
 MatrixXd occupancyGridToMatrix(){
-  MatrixXd m(occupancyGrid->info.height, occupancyGrid->info.width);
+  MatrixXd m = MatrixXd::Zero(occupancyGrid->info.height, occupancyGrid->info.width);
 
   for(int line=0; line < occupancyGrid->info.height; line++){
     for(int column=0; column < occupancyGrid->info.width; column++){
@@ -453,7 +570,7 @@ MatrixXd occupancyGridToMatrix(){
     }    
   }
   
-  std::cout << "Map matrix size ---->" << m.rows() << "x" << m.cols() << std::endl;
+  //std::cout << "Map matrix size ---->" << m.rows() << "x" << m.cols() << std::endl;
 
   return m;
 }
@@ -546,9 +663,7 @@ void transmit_state(State* s, ros::Publisher odom_pub)
 
 
 void scan_receiver(const sensor_msgs::LaserScan::ConstPtr& msg){
-  realZ = h(msg->ranges, msg->angle_min,true);
   scan=msg;
-   
 }
 
 int main(int argc, char **argv)
