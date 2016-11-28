@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2016.7.7)  28 NOV 2016 11:16
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2016.7.7)  28 NOV 2016 16:25
 entering extended mode
 **./Report.tex
 (Report.tex
@@ -134,18 +134,9 @@ Missing character: There is no Ã in font ptmr7t!
 Missing character: There is no § in font ptmr7t!
 Missing character: There is no Ã in font ptmr7t!
 Missing character: There is no § in font ptmr7t!
-(chapters/0_Abstract.tex
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <9> on input line 9.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 9.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 9.
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 9.
-) (chapters/1_Introduction.tex
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 18.
+(chapters/0_Abstract.tex) (chapters/1_Introduction.tex
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no © in font ptmr7t!
 ) (chapters/2_Methods.tex
 Missing character: There is no Ã in font ptmr7t!
 Missing character: There is no © in font ptmr7t!
@@ -168,31 +159,39 @@ Missing character: There is no ­ in font ptmr7t!
 ) (chapters/6_Appendices.tex)
 (chapters/7_Acknowledgment.tex) (chapters/8_References.tex
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 34.
-)
+(Font)              <8> on input line 35.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 35.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 35.
 Missing character: There is no Ã in font ptmr7t!
 Missing character: There is no ‰ in font ptmr7t!
  [1{C:/Users/Markus/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}
 
 
+])
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no ‰ in font ptmr7t!
+ [2
+
 ] (Report.aux) ) 
 Here is how much of TeX's memory you used:
- 1100 strings out of 493634
- 19891 string characters out of 8884832
+ 1101 strings out of 493634
+ 19979 string characters out of 8884832
  9070825 words of memory out of 99000000
- 4514 multiletter control sequences out of 15000+200000
- 43411 words of font info for 80 fonts, out of 90000 for 9000
+ 4519 multiletter control sequences out of 15000+200000
+ 40873 words of font info for 75 fonts, out of 90000 for 9000
  1028 hyphenation exceptions out of 8191
- 26i,5n,19p,895b,208s stack positions out of 5000i,500n,10000p,900000b,50000s
+ 26i,5n,19p,895b,275s stack positions out of 5000i,500n,10000p,900000b,50000s
 {C:/Users/Markus/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dv
 ips/fontname/8r.enc}<C:/Users/Markus/AppData/Local/Programs/MiKTeX 2.9/fonts/ty
 pe1/urw/times/utmb8a.pfb><C:/Users/Markus/AppData/Local/Programs/MiKTeX 2.9/fon
 ts/type1/urw/times/utmbi8a.pfb><C:/Users/Markus/AppData/Local/Programs/MiKTeX 2
 .9/fonts/type1/urw/times/utmr8a.pfb><C:/Users/Markus/AppData/Local/Programs/MiK
 TeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Report.pdf (1 page, 54645 bytes).
+Output written on Report.pdf (2 pages, 58631 bytes).
 PDF statistics:
- 23 PDF objects out of 1000 (max. 8388607)
+ 26 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
