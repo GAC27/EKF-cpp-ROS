@@ -89,7 +89,7 @@
 
 % *** CITATION PACKAGES ***
 %
-%\usepackage{cite}
+\usepackage{cite}
 % cite.sty was written by Donald Arseneau
 % V1.6 and later of IEEEtran pre-defines the format of the cite.sty package
 % \cite{} output to follow that of the IEEE. Loading the cite package will
@@ -329,7 +329,10 @@
 
 % *** PDF, URL AND HYPERLINK PACKAGES ***
 %
-%\usepackage{url}
+\usepackage{url}
+\usepackage{prettyref}
+\usepackage{titleref}
+\usepackage[colorlinks=true, linkcolor=black, citecolor=black, urlcolor=black]{hyperref}
 % url.sty was written by Donald Arseneau. It provides better support for
 % handling and breaking URLs. url.sty is already installed on most LaTeX
 % systems. The latest version and documentation can be obtained at:
@@ -402,7 +405,7 @@
 
 
 % The paper headers
-\markboth{INSTITUTO SUPERIOR TÉCNICO, AUTONOMOUS SYSTEMS, PROJECT REPORT, DECEMBER 2016}%
+\markboth{INSTITUTO SUPERIOR T\'{E}CNICO, AUTONOMOUS SYSTEMS, PROJECT REPORT, DECEMBER 2016}%
 {Shell \MakeLowercase{\textit{et al.}}: EKF-BASED LOCALIZATION WITH LRF}
 % The only time the second header will appear is for the odd numbered pages
 % after the title page when using the twoside option.
