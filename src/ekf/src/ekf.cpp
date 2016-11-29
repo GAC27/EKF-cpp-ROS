@@ -80,6 +80,7 @@ MatrixXd noiseQk = MatrixXd::Zero(3,3);
 MatrixXd Covariance_KplusOne = MatrixXd::Zero(3,3);
 MatrixXd Covariance_K = MatrixXd::Zero(3,3);
 MatrixXd map;
+ros::Publisher publisher_scan;
 
 int counter_steps = 0;
 
@@ -295,8 +296,14 @@ MatrixXd V(MatrixXd _realZ, MatrixXd _predictedZ){
 * The map data, in row-major order, starting with (0,0).  Occupancy
 * probabilities are in the range [0,100].  Unknown is -1. */
 std::vector<float> raycast(State s){
+
+  std::cout << "Position: X" << (s).x << " Y:" << (s).y << " Theta:" << (s).theta << std::endl;
+
+
   int grid_x = (unsigned int)((s.x - occupancyGrid->info.origin.position.x) / occupancyGrid->info.resolution);
   int grid_y = (unsigned int)((s.y - occupancyGrid->info.origin.position.y) / occupancyGrid->info.resolution);
+
+  std::cout << "Grid X: " << grid_x << " grid_y: " << grid_y << std::endl;
 
   //Parameters
   float ang_incr= 0.005814; //Taken from the laserScan topic
@@ -318,8 +325,8 @@ std::vector<float> raycast(State s){
 
   for(int i = 0; i < number_rays; i++){
     dist=0 - 0.125; // 0.125 is the distance between the center of the robot and the laser's positon
-    ind_x = (unsigned int)((prev_odom->x - occupancyGrid->info.origin.position.x) / occupancyGrid->info.resolution);
-    ind_y = (unsigned int)((prev_odom->y - occupancyGrid->info.origin.position.y) / occupancyGrid->info.resolution);
+    ind_x = grid_x;
+    ind_y = grid_y;
     
     while(dist <= max_range){
       if(ind_x < 0 || ind_x >= map.rows() || ind_y < 0 || ind_y >= map.cols()){
@@ -345,6 +352,33 @@ std::vector<float> raycast(State s){
 
 }
 
+void transmit_laser_scan(std::vector<float> f, const sensor_msgs::LaserScan::ConstPtr& msg,ros::Publisher scan_pub)
+{
+
+  int count = 0;
+  
+  ros::Time scan_time = ros::Time::now();
+
+  //populate the LaserScan message
+  sensor_msgs::LaserScan scan;
+  scan.header.stamp = scan_time;
+  scan.header.frame_id = "laser";
+  scan.angle_min = msg->angle_min;
+  scan.angle_max = msg->angle_max;
+  scan.angle_increment = msg->angle_increment;
+  unsigned int num_readings = floor((scan.angle_max - scan.angle_min)/scan.angle_increment);
+  scan.time_increment = msg->time_increment;
+  scan.range_min = msg->range_min;
+  scan.range_max = msg->range_max;
+
+  scan.ranges.resize(num_readings);
+  scan.ranges = f;
+
+  scan_pub.publish(scan);
+  ++count;
+
+}
+
 MatrixXd prediction(ros::Time time_step){
 
   //std::cout << "State:" << prev_state->x << " " << prev_state->y << " " << prev_state->theta << std::endl;
@@ -359,6 +393,7 @@ MatrixXd prediction(ros::Time time_step){
 
   //printf("post-Covariance\n");
   std::vector<float> predictedObservation = raycast(*new_state);
+  transmit_laser_scan(predictedObservation, scan, publisher_scan);
 
  // printf("post-Covariance\n");
   MatrixXd predictedZ = h(predictedObservation, new_state->theta);
@@ -593,32 +628,7 @@ void map_receiver(const nav_msgs::OccupancyGrid::ConstPtr& msg){
 }
 
 
-void transmit_laser_scan(std::vector<float> f, const sensor_msgs::LaserScan::ConstPtr& msg,ros::Publisher scan_pub)
-{
 
-  int count = 0;
-  
-  ros::Time scan_time = ros::Time::now();
-
-  //populate the LaserScan message
-  sensor_msgs::LaserScan scan;
-  scan.header.stamp = scan_time;
-  scan.header.frame_id = "laser";
-  scan.angle_min = msg->angle_min;
-  scan.angle_max = msg->angle_max;
-  scan.angle_increment = msg->angle_increment;
-  unsigned int num_readings = floor((scan.angle_max - scan.angle_min)/scan.angle_increment);
-  scan.time_increment = msg->time_increment;
-  scan.range_min = msg->range_min;
-  scan.range_max = msg->range_max;
-
-  scan.ranges.resize(num_readings);
-  scan.ranges = f;
-
-  scan_pub.publish(scan);
-  ++count;
-
-}
 
 
 void transmit_state(State* s, ros::Publisher odom_pub)
@@ -678,7 +688,7 @@ int main(int argc, char **argv)
   ros::Subscriber sub_map = n.subscribe("/map_from_map_server", 1000, map_receiver);    //Has to subscribe to our moded_map_server topic in order to avoid rewriting the map
 
   ros::Publisher pub_new_estimates = n.advertise<nav_msgs::Odometry>("EKF_New_State", 1000);
-  //ros::Publisher scan_pub = n.advertise<sensor_msgs::LaserScan>("bla_scan", 50);
+  publisher_scan = n.advertise<sensor_msgs::LaserScan>("bla_scan", 50);
 
 
   ros::Rate loop_rate(10);   
