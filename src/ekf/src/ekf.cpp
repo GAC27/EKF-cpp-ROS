@@ -153,17 +153,17 @@ MatrixXd F(State prev_state, State new_state){
 
 MatrixXd PredictedCovariance(/*MatrixXd covarianceK,*/ State prev_state, State new_state){
 
-  noiseQk(0,0) = 0.5;
+  noiseQk(0,0) = 0.9;
   noiseQk(0,1) = 0;
   noiseQk(0,2) = 0;
 
   noiseQk(1,0) = 0;
-  noiseQk(1,1) = 0.5;
+  noiseQk(1,1) = 0.9;
   noiseQk(1,2) = 0;
 
   noiseQk(2,0) = 0;
   noiseQk(2,1) = 0;
-  noiseQk(2,2) = 0.5;
+  noiseQk(2,2) = 0.9;
   //printf("Nose done\n");
   MatrixXd jacobi = F(prev_state,new_state);
   //printf("F\n");  

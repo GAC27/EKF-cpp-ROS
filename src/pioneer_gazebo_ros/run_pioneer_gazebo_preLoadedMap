@@ -33,7 +33,7 @@ pid="$pid $!"
 sleep 5s
 
 echo "Launching Map"
-rosrun moded_map_server moded_map_server SmallFirstRoom.yaml &
+rosrun moded_map_server moded_map_server gazebo5FloorMap.yaml &
 pid="$pid $!"
 
 sleep 3s
