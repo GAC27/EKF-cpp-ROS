@@ -153,17 +153,17 @@ MatrixXd F(State prev_state, State new_state){
 
 MatrixXd PredictedCovariance(/*MatrixXd covarianceK,*/ State prev_state, State new_state){
 
-  noiseQk(0,0) = 0.9;
+  noiseQk(0,0) = 0.01;
   noiseQk(0,1) = 0;
   noiseQk(0,2) = 0;
 
   noiseQk(1,0) = 0;
-  noiseQk(1,1) = 0.9;
+  noiseQk(1,1) = 0.01;
   noiseQk(1,2) = 0;
 
   noiseQk(2,0) = 0;
   noiseQk(2,1) = 0;
-  noiseQk(2,2) = 0.9;
+  noiseQk(2,2) = 0.01;
   //printf("Nose done\n");
   MatrixXd jacobi = F(prev_state,new_state);
   //printf("F\n");  
@@ -216,23 +216,24 @@ MatrixXd h(std::vector<float> distances,float theta/*, bool thetaIsStart*/){
   //float ang_incr= scan_ang/3; //Taken from the laserScan topic
   
   float ang_start;
+   ang_start = theta - scan_ang / 2;
 /*
   if(thetaIsStart){
     ang_start = theta;
     std::cout << "theta Is Start: " << ang_start<<std::endl;
   }
   else{
-    ang_start = theta - scan_ang / 2; 
+   
     std::cout << "theta Is not Start: " << theta<<std::endl;
 
   }
 */
   //MatrixXd result(2,distances.size());
-  MatrixXd result = MatrixXd::Zero(2,3);
+  MatrixXd result = MatrixXd::Zero(2,72);
   float fi;
   int i=0;
   int j=0;
-  for(; i < distances.size() ; i+= (distances.size()/ 2) - 1, j++){
+  for(; i < distances.size() ; i+= (distances.size()/ 72), j++){
     //std::cout << "J is:" << j << std::endl;
     //std::cout << "I is:" << i << std::endl;
     fi=ang_start + ang_incr * i;
@@ -491,7 +492,7 @@ std::vector<MatrixXd> S_KplusOne(std::vector<MatrixXd> H, MatrixXd CovarianceKpl
 
 std::vector<int> matching(std::vector<MatrixXd> S_KplusOne, MatrixXd _V){
   //TODO Change GAMA
-  int Gama = 50;
+  int Gama = 1;
   std::vector<int> index_to_include;
   MatrixXd vij(2,1);
   for(int i=0; i < _V.rows() / 2; i++){
@@ -500,6 +501,7 @@ std::vector<int> matching(std::vector<MatrixXd> S_KplusOne, MatrixXd _V){
     MatrixXd val = vij.transpose() * S_KplusOne[i] * vij; 
     if(val(0,0) <= Gama){
       index_to_include.push_back(i);
+      std::cout << "Matching step value Distance: " << vij(0,0) << " Theta: " << vij(1,0)  << std::endl;
     }
   }
   return index_to_include;
