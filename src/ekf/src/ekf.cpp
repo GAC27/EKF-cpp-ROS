@@ -12,13 +12,7 @@
 #include <Eigen/Dense>
 #define _USE_MATH_DEFINES
 #include <math.h> 
-/*#include "tf/transform_listener.h"
-#include "sensor_msgs/PointCloud.h"
-#include "tf/message_filter.h"
-#include "message_filters/subscriber.h"
-#include "laser_geometry/laser_geometry.h"
-#include "tf/transform_datatypes.h"
-*/
+
 
 using Eigen::MatrixXd;
 
@@ -112,27 +106,6 @@ State* f(State* prevState,State* odomState, State* currentOdom, ros::Time time_n
 }
 
 MatrixXd F(State prev_state, State new_state){
-  /*std::vector<float> v; 
-  double delta_time = new_state.time_now.toSec() - prev_state.time_now.toSec();
-  float vx = get_velocity(new_state.x, prev_state.x, delta_time);
-  float vy = get_velocity(new_state.y, prev_state.y, delta_time);
-  float theta = prev_state.theta;
-  float x = (-sin(theta)* vx - cos(theta) * vy)* delta_time;
-  float y = (cos(theta) * vx + sin(theta) * vy)* delta_time;
-  
-  MatrixXd m(3,3);
-  m(0,0) = 1;
-  m(1,0) = 0;
-  m(2,0) = 0;
-
-  m(0,1) = 0;
-  m(1,1) = 1;
-  m(2,1) = 0;
-
-  m(0,2) = x;
-  m(1,2) = y;
-  m(2,2) = 1;
-  */  
   MatrixXd m(3,3);
   m(0,0) = 1;
   m(1,0) = 0;
@@ -151,7 +124,7 @@ MatrixXd F(State prev_state, State new_state){
 }
 
 
-MatrixXd PredictedCovariance(/*MatrixXd covarianceK,*/ State prev_state, State new_state){
+MatrixXd PredictedCovariance(State prev_state, State new_state){
 
   noiseQk(0,0) = 0.5;
   noiseQk(0,1) = 0;
@@ -205,17 +178,6 @@ MatrixXd UpdateCovariance(MatrixXd PredictedCovariance, MatrixXd Kalman_gain, st
 
 	//std::cout << "diagonal_S_KplusOne lines ->" << diagonal_S_KplusOne.rows() << " cols->" << diagonal_S_KplusOne.cols() << std::endl;
 
-	//~ if(PredictedCovariance(0,0) < 0)
-		//~ PredictedCovariance(0,0) = -PredictedCovariance(0,0);
-		
-	
-	//~ if(PredictedCovariance(1,1) < 0)
-		//~ PredictedCovariance(1,1) = -PredictedCovariance(1,1);	
-	
-	//~ if(PredictedCovariance(2,2) < 0)
-		//~ PredictedCovariance(2,2) = -PredictedCovariance(2,2);	
-	
-	
 	
 	return (PredictedCovariance - Kalman_gain * diagonal_S_KplusOne * Kalman_gain.transpose());
 }
@@ -227,19 +189,8 @@ MatrixXd h(std::vector<float> distances,float theta/*, bool thetaIsStart*/){
   //float ang_incr= scan_ang/3; //Taken from the laserScan topic
   
   float ang_start;
-   ang_start = theta - scan_ang / 2;
-/*
-  if(thetaIsStart){
-    ang_start = theta;
-    std::cout << "theta Is Start: " << ang_start<<std::endl;
-  }
-  else{
-   
-    std::cout << "theta Is not Start: " << theta<<std::endl;
+  ang_start = theta - scan_ang / 2;
 
-  }
-*/
-  //MatrixXd result(2,distances.size());
   MatrixXd result = MatrixXd::Zero(2,72);
   float fi;
   int i=0;
@@ -577,7 +528,7 @@ void ekf_step(ros::Time time_step){
    // std::cout << "realZ:" << realZ << std::endl;
    // std::cout << "predictedZ:" << predictedZ << std::endl;
 
-    MatrixXd _V = V(realZ, predictedZ); //Who you gonna call? MATH DUDE! How do we accept the value??
+    MatrixXd _V = V(realZ, predictedZ); 
     
 	std::cout << "Before V: \n" << _V << std::endl;
 
