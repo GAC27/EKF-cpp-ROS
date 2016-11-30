@@ -153,17 +153,17 @@ MatrixXd F(State prev_state, State new_state){
 
 MatrixXd PredictedCovariance(/*MatrixXd covarianceK,*/ State prev_state, State new_state){
 
-  noiseQk(0,0) = 0.1;
+  noiseQk(0,0) = 0.5;
   noiseQk(0,1) = 0;
   noiseQk(0,2) = 0;
 
   noiseQk(1,0) = 0;
-  noiseQk(1,1) = 0.1;
+  noiseQk(1,1) = 0.5;
   noiseQk(1,2) = 0;
 
   noiseQk(2,0) = 0;
   noiseQk(2,1) = 0;
-  noiseQk(2,2) = 0.1;
+  noiseQk(2,2) = 0.5;
   //printf("Nose done\n");
   MatrixXd jacobi = F(prev_state,new_state);
   //printf("F\n");  
@@ -187,7 +187,8 @@ MatrixXd UpdateCovariance(MatrixXd PredictedCovariance, MatrixXd Kalman_gain, st
 
 	//std::cout << "Created stacked Matrix" << std::endl;
 
-
+  std::cout << "K Size in Update Covariance: " << Kalman_gain.rows() << " " << Kalman_gain.cols() << std::endl;
+  std::cout << "S Size in Update Covariance: " << diagonal_S_KplusOne.rows() << " " << diagonal_S_KplusOne.cols() << std::endl;
 	for(int i=0; i < _S_KplusOne.size(); i++){
 	diagonal_S_KplusOne(i*2,i*2)=_S_KplusOne[i](0,0);
 	diagonal_S_KplusOne(i*2,i*2 + 1)=_S_KplusOne[i](0,1);
@@ -216,7 +217,7 @@ MatrixXd UpdateCovariance(MatrixXd PredictedCovariance, MatrixXd Kalman_gain, st
 	
 	
 	
-	return PredictedCovariance - Kalman_gain * diagonal_S_KplusOne * Kalman_gain.transpose();
+	return (PredictedCovariance - Kalman_gain * diagonal_S_KplusOne * Kalman_gain.transpose());
 }
 
 
@@ -510,16 +511,17 @@ std::vector<MatrixXd> S_KplusOne(std::vector<MatrixXd> H, MatrixXd CovarianceKpl
 
 std::vector<int> matching(std::vector<MatrixXd> S_KplusOne, MatrixXd _V){
   //TODO Change GAMA
-  float Gama = 0.02;
+  float Gama = 1;
   std::vector<int> index_to_include;
   MatrixXd vij(2,1);
-  MatrixXd val;
+  MatrixXd val(1,1);
   for(int i=0; i < _V.rows() / 2; i++){
     vij(0,0) = _V(i,0);
     vij(1,0) = _V(i+1,0);
     val = vij.transpose() * S_KplusOne[i].inverse() * vij; 
     //~ std::cout << "MAtching value index= " << i << "val=" << val << std::endl;
     if(val(0,0) <= Gama){
+      std::cout << "Val: " << val(0,0); 
       index_to_include.push_back(i);
       std::cout << "Matching step value Distance: " << vij(0,0) << " Theta: " << vij(1,0)  << std::endl;
     }
@@ -539,9 +541,9 @@ void ekf_step(ros::Time time_step){
     float theta = current_odom->theta;
     prev_state = new State(x,y,theta, time_step);
     prev_odom = new State(x,y,theta,time_step);
-    Covariance_K << 1, 0, 0,
-                    0, 1, 0,
-                    0, 0, 1;
+    Covariance_K << 0.1, 0, 0,
+                    0, 0.1, 0,
+                    0, 0, 0.1;
     //printf("First Step\n"); 
 
   }
