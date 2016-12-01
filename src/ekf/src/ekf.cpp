@@ -14,6 +14,7 @@
 #include <math.h> 
 #include <limits>
 #include <laser_assembler/AssembleScans.h>
+#include <laser_geometry/laser_geometry.h>
 
 using namespace laser_assembler;
 using Eigen::MatrixXd;
@@ -77,8 +78,15 @@ MatrixXd Covariance_KplusOne = MatrixXd::Zero(3,3);
 MatrixXd Covariance_K = MatrixXd::Zero(3,3);
 MatrixXd map;
 ros::Publisher publisher_scan;
-ros::Publisher real_point_cloud_publisher;
-ros::Publisher real_point_cloud_publisher;
+ros::Publisher real_point_cloud_publisher_;
+ros::Publisher predicted_point_cloud_publisher_;
+
+//~ DEBUG
+laser_geometry::LaserProjection projector;
+tf::TransformListener* listener;
+
+
+//~ DEBUG
 
 
 int counter_steps = 0;
@@ -271,6 +279,12 @@ void transmit_laser_scan(std::vector<float> f, const sensor_msgs::LaserScan::Con
   scan.ranges = f;
 
   scan_pub.publish(scan);
+  
+  sensor_msgs::PointCloud2 cloud;
+  projector.transformLaserScanToPointCloud("base_link",scan, cloud,*listener);
+
+  // Do something with cloud.
+  predicted_point_cloud_publisher_.publish(cloud);
 
 }
 
@@ -514,6 +528,11 @@ void transmit_state(State* s, ros::Publisher odom_pub)
 
 void scan_receiver(const sensor_msgs::LaserScan::ConstPtr& msg){
   scan=msg;
+  sensor_msgs::PointCloud2 cloud;
+  projector.transformLaserScanToPointCloud("base_link",*msg, cloud,*listener);
+
+  // Do something with cloud.
+  real_point_cloud_publisher_.publish(cloud);
 }
 
 int main(int argc, char **argv)
@@ -523,14 +542,16 @@ int main(int argc, char **argv)
 
 	ros::NodeHandle n;
 
+	listener= new tf::TransformListener();
+
 	ros::Subscriber sub_odom = n.subscribe("odom", 1000, odom_receiver);
 	ros::Subscriber sub_scan = n.subscribe("base_scan", 1000, scan_receiver);
 	ros::Subscriber sub_map = n.subscribe("/map_from_map_server", 1000, map_receiver);    //Has to subscribe to our moded_map_server topic in order to avoid rewriting the map
 
 	ros::Publisher pub_new_estimates = n.advertise<nav_msgs::Odometry>("EKF_New_State", 1000);
 	publisher_scan = n.advertise<sensor_msgs::LaserScan>("bla_scan", 50);
-	predicted_point_cloud_publisher_ = n.advertise<sensor_msgs::PointCloud> ("predicted_scan_cloud", 100, false);
-	real_point_cloud_publisher_ = n.advertise<sensor_msgs::PointCloud> ("base_scan_cloud", 100, false);
+	predicted_point_cloud_publisher_ = n.advertise<sensor_msgs::PointCloud2> ("predicted_scan_cloud", 100, false);
+	real_point_cloud_publisher_ = n.advertise<sensor_msgs::PointCloud2> ("base_scan_cloud", 100, false);
 
 	ros::Rate loop_rate(10);   
 
@@ -538,28 +559,10 @@ int main(int argc, char **argv)
 	{
 
 		if(Map_Active){
-		  //printf("ekf_step\n");
 		  ekf_step(ros::Time::now());
 		  
-		  //~ \/ DEBUG
-		  ros::service::waitForService("assemble_scans");
-		  ros::ServiceClient client = n.serviceClient<AssembleScans>("assemble_scans");
-		  AssembleScans srv;
-		  srv.request.begin = ros::Time(0,0);
-		  srv.request.end   = ros::Time::now();
-		  if (client.call(srv)){
-			printf("Got cloud with %u points\n", srv.response.cloud.points.size());
-			point_cloud_publisher_.publish(srv.response.cloud);
-		  }
-		  else
-			printf("Service call failed\n");
-		  //~ /\ DEBUG
-		  
-		  
-		  //printf("transmit\n");
 		  transmit_state(prev_state, pub_new_estimates);
 
-		//      printf("end\n");
 		  counter_steps++;
 		}
 
