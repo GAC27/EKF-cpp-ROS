@@ -2,7 +2,7 @@
   <node type="laser_scan_assembler" pkg="laser_assembler"
         name="Laser_scan_to_point_cloud">
     <remap from="scan" to="base_scan"/>
-    <param name="max_scans" type="int" value="400" />
+    <param name="max_scans" type="int" value="1" />
     <param name="fixed_frame" type="string" value="base_link" />
   </node>
 </launch>

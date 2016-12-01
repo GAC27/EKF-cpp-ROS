@@ -77,6 +77,9 @@ MatrixXd Covariance_KplusOne = MatrixXd::Zero(3,3);
 MatrixXd Covariance_K = MatrixXd::Zero(3,3);
 MatrixXd map;
 ros::Publisher publisher_scan;
+ros::Publisher real_point_cloud_publisher;
+ros::Publisher real_point_cloud_publisher;
+
 
 int counter_steps = 0;
 
@@ -526,9 +529,8 @@ int main(int argc, char **argv)
 
 	ros::Publisher pub_new_estimates = n.advertise<nav_msgs::Odometry>("EKF_New_State", 1000);
 	publisher_scan = n.advertise<sensor_msgs::LaserScan>("bla_scan", 50);
-	ros::Publisher point_cloud_publisher_ = n.advertise<sensor_msgs::PointCloud> ("base_scan_cloud", 100, false);
-	
-
+	predicted_point_cloud_publisher_ = n.advertise<sensor_msgs::PointCloud> ("predicted_scan_cloud", 100, false);
+	real_point_cloud_publisher_ = n.advertise<sensor_msgs::PointCloud> ("base_scan_cloud", 100, false);
 
 	ros::Rate loop_rate(10);   
 
