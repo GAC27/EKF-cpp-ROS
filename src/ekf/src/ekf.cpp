@@ -112,9 +112,9 @@ MatrixXd F(State prev_state, State new_state){
 
 
 MatrixXd PredictedCovariance(State prev_state, State new_state){
-	noiseQk << 0.0, 0, 0,
-			   0, 0.0, 0,
-			   0, 0, 0.0;
+	noiseQk << 0.05, 0, 0,
+			   0, 0.05, 0,
+			   0, 0, 0.05;
 			   
 	MatrixXd jacobi = F(prev_state,new_state);
 	MatrixXd jacobiTransposed= jacobi.transpose();
@@ -187,8 +187,8 @@ MatrixXd V(MatrixXd _realZ, MatrixXd _predictedZ){
 	for(int i = 0 ; i < _realZ.cols() ; i++){
 		innovation(i*2,0) = _realZ(0,i) - _predictedZ(0,i);
 		innovation(i*2 + 1,0) = _realZ(1,i) - _predictedZ(1,i);
+		std::cout<< "Distance[" << i << "]=" << innovation(i*2,0) << std::endl;
 	}
-	
 	return innovation;
 }
 
@@ -207,8 +207,8 @@ std::vector<float> raycast(State s){
 	//Parameters
 	float ang_incr= 0.005814; //Taken from the laserScan topic
 	float scan_ang= 2.090000 * 2; //Taken from the laserScan topic
-	float resolution= occupancyGrid->info.resolution;       //TODO adjust values
-	float max_range=5.600000;       //TODO adjust values        
+	float resolution= occupancyGrid->info.resolution;
+	float max_range=5.600000;        
 
 	double number_rays= 720; 
 	std::vector<float> scan;  
@@ -222,7 +222,7 @@ std::vector<float> raycast(State s){
 	float ind_x;
 	float ind_y;
 
-	for(int i = 0; i < number_rays; i++){
+	for(int i = 0; i < number_rays; i++, ang += ang_incr ){
 		dist=0;
 		ind_x = grid_x;
 		ind_y = grid_y;
@@ -243,8 +243,7 @@ std::vector<float> raycast(State s){
 		if(dist > max_range){
 			scan.push_back(-1);
 		}
-
-		ang += ang_incr; 
+		
 	} 
 
 	return scan;
@@ -292,6 +291,10 @@ State* update(State* new_state, MatrixXd kalman_Gain, MatrixXd V_matrix, std::ve
 
 	MatrixXd _update = new_state->stateToMatrix() + kalman_Gain * V_matrix;
 
+	std::cout <<  "Kalman=\n" << kalman_Gain << std::endl;
+	
+	std::cout <<  "Kalman * V=\n" << kalman_Gain * V_matrix << std::endl;
+
 	Covariance_K = UpdateCovariance( Covariance_KplusOne, kalman_Gain, SKplusOne);
 
 	State* updatedState= new State(_update);
@@ -336,17 +339,16 @@ MatrixXd KkplusOne(MatrixXd CovarianceKplusOne,std::vector<MatrixXd> H,std::vect
 }
 
 
-//~ TODO
 std::vector<MatrixXd> S_KplusOne(std::vector<MatrixXd> H, MatrixXd CovarianceKplusOne ){
   
 	std::vector<MatrixXd> _S_KplusOne;
 
 	MatrixXd Rk(2,2);
-	Rk << 0.0, 0,
-		0,    0.0;
+	Rk << 4.3, 0,
+		   0, 4.3;
 
 	for(int i=0; i < H.size(); i++){
-		_S_KplusOne.push_back(H[i] * CovarianceKplusOne * H[i].transpose() + Rk);  //Possibly wrong
+		_S_KplusOne.push_back(H[i] * CovarianceKplusOne * H[i].transpose() + Rk);
 	}
 
 
@@ -356,7 +358,7 @@ std::vector<MatrixXd> S_KplusOne(std::vector<MatrixXd> H, MatrixXd CovarianceKpl
 
 std::vector<int> matching(std::vector<MatrixXd> S_KplusOne, MatrixXd _V){
 	//TODO Change GAMMA MathDude Stuff
-	float Gama = 0.05;
+	float Gama = 0.08;
 	std::vector<int> index_to_include;
 	MatrixXd vij(2,1);
 	MatrixXd val(1,1);
@@ -384,9 +386,9 @@ void ekf_step(ros::Time time_step){
 		float theta = current_odom->theta;
 		prev_state = new State(x,y,theta, time_step);
 		prev_odom = new State(x,y,theta,time_step);
-		Covariance_K << 0.1, 0, 0,
-						0, 0.1, 0,
-						0, 0, 0.1;
+		Covariance_K << 0.02, 0, 0,
+						0, 0.02, 0,
+						0, 0, 0.02;
 	}
 	else
 	{
@@ -400,33 +402,31 @@ void ekf_step(ros::Time time_step){
 		//Matching Step
 		MatrixXd _V = V(realZ, predictedZ); 
 
-		std::vector<int> index_to_include = matching(SKplusOne, _V);
+		//~ std::vector<int> index_to_include = matching(SKplusOne, _V);
 
-		std::vector<MatrixXd> _H_copy;
-		std::vector<MatrixXd> SKplusOne_copy;
-		MatrixXd _V_copy(index_to_include.size()*2, 1);
+		//~ std::vector<MatrixXd> _H_copy;
+		//~ std::vector<MatrixXd> SKplusOne_copy;
+		//~ MatrixXd _V_copy(index_to_include.size()*2, 1);
 
-		int j;
-		for(int i=0; i < index_to_include.size(); i++){
-			j = index_to_include[i];
-			_H_copy.push_back(_H[j]);
-			SKplusOne_copy.push_back(SKplusOne[j]);
-			_V_copy(i*2,0) = _V(j*2,0);
-			_V_copy(i*2 +1,0) = _V(j*2 +1,0);
-		}
+		//~ int j;
+		//~ for(int i=0; i < index_to_include.size(); i++){
+			//~ j = index_to_include[i];
+			//~ _H_copy.push_back(_H[j]);
+			//~ SKplusOne_copy.push_back(SKplusOne[j]);
+			//~ _V_copy(i*2,0) = _V(j*2,0);
+			//~ _V_copy(i*2 +1,0) = _V(j*2 +1,0);
+		//~ }
 
-		_H = _H_copy;
-		SKplusOne = SKplusOne_copy;
-		_V = _V_copy;
+		//~ _H = _H_copy;
+		//~ SKplusOne = SKplusOne_copy;
+		//~ _V = _V_copy;
 
-		//Update Step
-		std::cout << "before update Cov(K+1|k)=" << Covariance_KplusOne << std::endl;
-		prev_state=update(new_state,KkplusOne(Covariance_KplusOne, _H, SKplusOne), _V, SKplusOne);
+		//~ //Update Step
+		//~ std::cout << "before update Cov(K+1|k)=" << Covariance_KplusOne << std::endl;
+		//~ prev_state=update(new_state,KkplusOne(Covariance_KplusOne, _H, SKplusOne), _V, SKplusOne);
 
-		std::cout << "updated state X-> " << (*prev_state).x << " Y-> " << (*prev_state).y << " Thetas-> " << (*prev_state).theta << std::endl; 
-		// printf("update\n");
-		prev_odom=current_odom;
-		//  printf("prev_odom\n");
+		//~ std::cout << "updated state X-> " << (*prev_state).x << " Y-> " << (*prev_state).y << " Thetas-> " << (*prev_state).theta << std::endl; 
+		//~ prev_odom=current_odom;
 	}
 }
 
