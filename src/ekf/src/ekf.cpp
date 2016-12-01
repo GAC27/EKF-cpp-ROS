@@ -104,8 +104,8 @@ State* f(State* prevState,State* odomState, State* currentOdom, ros::Time time_n
 
 MatrixXd F(State prev_state, State new_state){
   MatrixXd m(3,3);
-  m << 1, 0, 0,
-	   0, 1, 0,
+  m << 1, 0, -(new_state.y-prev_state.y),
+	   0, 1, -(new_state.x-prev_state.x),
 	   0, 0, 1;
   return m;
 }
@@ -187,7 +187,6 @@ MatrixXd V(MatrixXd _realZ, MatrixXd _predictedZ){
 	for(int i = 0 ; i < _realZ.cols() ; i++){
 		innovation(i*2,0) = _realZ(0,i) - _predictedZ(0,i);
 		innovation(i*2 + 1,0) = _realZ(1,i) - _predictedZ(1,i);
-		std::cout<< "Distance[" << i << "]=" << innovation(i*2,0) << std::endl;
 	}
 	return innovation;
 }
@@ -402,31 +401,31 @@ void ekf_step(ros::Time time_step){
 		//Matching Step
 		MatrixXd _V = V(realZ, predictedZ); 
 
-		//~ std::vector<int> index_to_include = matching(SKplusOne, _V);
+		std::vector<int> index_to_include = matching(SKplusOne, _V);
 
-		//~ std::vector<MatrixXd> _H_copy;
-		//~ std::vector<MatrixXd> SKplusOne_copy;
-		//~ MatrixXd _V_copy(index_to_include.size()*2, 1);
+		std::vector<MatrixXd> _H_copy;
+		std::vector<MatrixXd> SKplusOne_copy;
+		MatrixXd _V_copy(index_to_include.size()*2, 1);
 
-		//~ int j;
-		//~ for(int i=0; i < index_to_include.size(); i++){
-			//~ j = index_to_include[i];
-			//~ _H_copy.push_back(_H[j]);
-			//~ SKplusOne_copy.push_back(SKplusOne[j]);
-			//~ _V_copy(i*2,0) = _V(j*2,0);
-			//~ _V_copy(i*2 +1,0) = _V(j*2 +1,0);
-		//~ }
+		int j;
+		for(int i=0; i < index_to_include.size(); i++){
+			j = index_to_include[i];
+			_H_copy.push_back(_H[j]);
+			SKplusOne_copy.push_back(SKplusOne[j]);
+			_V_copy(i*2,0) = _V(j*2,0);
+			_V_copy(i*2 +1,0) = _V(j*2 +1,0);
+		}
 
-		//~ _H = _H_copy;
-		//~ SKplusOne = SKplusOne_copy;
-		//~ _V = _V_copy;
+		_H = _H_copy;
+		SKplusOne = SKplusOne_copy;
+		_V = _V_copy;
 
-		//~ //Update Step
-		//~ std::cout << "before update Cov(K+1|k)=" << Covariance_KplusOne << std::endl;
-		//~ prev_state=update(new_state,KkplusOne(Covariance_KplusOne, _H, SKplusOne), _V, SKplusOne);
+		//Update Step
+		std::cout << "before update Cov(K+1|k)=" << Covariance_KplusOne << std::endl;
+		prev_state=update(new_state,KkplusOne(Covariance_KplusOne, _H, SKplusOne), _V, SKplusOne);
 
-		//~ std::cout << "updated state X-> " << (*prev_state).x << " Y-> " << (*prev_state).y << " Thetas-> " << (*prev_state).theta << std::endl; 
-		//~ prev_odom=current_odom;
+		std::cout << "updated state X-> " << (*prev_state).x << " Y-> " << (*prev_state).y << " Thetas-> " << (*prev_state).theta << std::endl; 
+		prev_odom=current_odom;
 	}
 }
 
