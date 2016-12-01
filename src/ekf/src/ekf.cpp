@@ -13,8 +13,9 @@
 #define _USE_MATH_DEFINES
 #include <math.h> 
 #include <limits>
+#include <laser_assembler/AssembleScans.h>
 
-
+using namespace laser_assembler;
 using Eigen::MatrixXd;
 
 
@@ -395,37 +396,38 @@ void ekf_step(ros::Time time_step){
 		MatrixXd predictedZ  = prediction(time_step);
 
 		std::vector<MatrixXd> _H = H(predictedZ,*new_state);
-		
+
 		std::vector<MatrixXd> SKplusOne = S_KplusOne( _H, Covariance_KplusOne);
 
-		//Matching Step
-		MatrixXd _V = V(realZ, predictedZ); 
+		//~ //Matching Step
+		//~ MatrixXd _V = V(realZ, predictedZ); 
 
-		std::vector<int> index_to_include = matching(SKplusOne, _V);
+		//~ std::vector<int> index_to_include = matching(SKplusOne, _V);
 
-		std::vector<MatrixXd> _H_copy;
-		std::vector<MatrixXd> SKplusOne_copy;
-		MatrixXd _V_copy(index_to_include.size()*2, 1);
+		//~ std::vector<MatrixXd> _H_copy;
+		//~ std::vector<MatrixXd> SKplusOne_copy;
+		//~ MatrixXd _V_copy(index_to_include.size()*2, 1);
 
-		int j;
-		for(int i=0; i < index_to_include.size(); i++){
-			j = index_to_include[i];
-			_H_copy.push_back(_H[j]);
-			SKplusOne_copy.push_back(SKplusOne[j]);
-			_V_copy(i*2,0) = _V(j*2,0);
-			_V_copy(i*2 +1,0) = _V(j*2 +1,0);
-		}
+		//~ int j;
+		//~ for(int i=0; i < index_to_include.size(); i++){
+			//~ j = index_to_include[i];
+			//~ _H_copy.push_back(_H[j]);
+			//~ SKplusOne_copy.push_back(SKplusOne[j]);
+			//~ _V_copy(i*2,0) = _V(j*2,0);
+			//~ _V_copy(i*2 +1,0) = _V(j*2 +1,0);
+		//~ }
 
-		_H = _H_copy;
-		SKplusOne = SKplusOne_copy;
-		_V = _V_copy;
+		//~ _H = _H_copy;
+		//~ SKplusOne = SKplusOne_copy;
+		//~ _V = _V_copy;
 
-		//Update Step
-		std::cout << "before update Cov(K+1|k)=" << Covariance_KplusOne << std::endl;
-		prev_state=update(new_state,KkplusOne(Covariance_KplusOne, _H, SKplusOne), _V, SKplusOne);
+		//~ //Update Step
+		//~ std::cout << "before update Cov(K+1|k)=" << Covariance_KplusOne << std::endl;
+		//~ prev_state=update(new_state,KkplusOne(Covariance_KplusOne, _H, SKplusOne), _V, SKplusOne);
 
-		std::cout << "updated state X-> " << (*prev_state).x << " Y-> " << (*prev_state).y << " Thetas-> " << (*prev_state).theta << std::endl; 
-		prev_odom=current_odom;
+		//~ std::cout << "updated state X-> " << (*prev_state).x << " Y-> " << (*prev_state).y << " Thetas-> " << (*prev_state).theta << std::endl; 
+		//~ prev_odom=current_odom;
+
 	}
 }
 
@@ -514,43 +516,60 @@ void scan_receiver(const sensor_msgs::LaserScan::ConstPtr& msg){
 int main(int argc, char **argv)
 {
 
-  ros::init(argc, argv, "ekf");   
+	ros::init(argc, argv, "ekf");   
 
-  ros::NodeHandle n;
+	ros::NodeHandle n;
 
-  ros::Subscriber sub_odom = n.subscribe("odom", 1000, odom_receiver);
-  ros::Subscriber sub_scan = n.subscribe("base_scan", 1000, scan_receiver);
-  ros::Subscriber sub_map = n.subscribe("/map_from_map_server", 1000, map_receiver);    //Has to subscribe to our moded_map_server topic in order to avoid rewriting the map
+	ros::Subscriber sub_odom = n.subscribe("odom", 1000, odom_receiver);
+	ros::Subscriber sub_scan = n.subscribe("base_scan", 1000, scan_receiver);
+	ros::Subscriber sub_map = n.subscribe("/map_from_map_server", 1000, map_receiver);    //Has to subscribe to our moded_map_server topic in order to avoid rewriting the map
 
-  ros::Publisher pub_new_estimates = n.advertise<nav_msgs::Odometry>("EKF_New_State", 1000);
-  publisher_scan = n.advertise<sensor_msgs::LaserScan>("bla_scan", 50);
-
-
-  ros::Rate loop_rate(10);   
-
-  while (ros::ok())
-  {
-    
-    if(Map_Active){
-      //printf("ekf_step\n");
-      ekf_step(ros::Time::now());
-      
-      //printf("transmit\n");
-      transmit_state(prev_state, pub_new_estimates);
-
-//      printf("end\n");
-      counter_steps++;
-    }
-    
-    ros::spinOnce();
-
-    loop_rate.sleep();
-  
-
-  }
+	ros::Publisher pub_new_estimates = n.advertise<nav_msgs::Odometry>("EKF_New_State", 1000);
+	publisher_scan = n.advertise<sensor_msgs::LaserScan>("bla_scan", 50);
+	ros::Publisher point_cloud_publisher_ = n.advertise<sensor_msgs::PointCloud> ("base_scan_cloud", 100, false);
+	
 
 
-  ros::spin();
+	ros::Rate loop_rate(10);   
 
-  return 0;
+	while (ros::ok())
+	{
+
+		if(Map_Active){
+		  //printf("ekf_step\n");
+		  ekf_step(ros::Time::now());
+		  
+		  //~ \/ DEBUG
+		  ros::service::waitForService("assemble_scans");
+		  ros::ServiceClient client = n.serviceClient<AssembleScans>("assemble_scans");
+		  AssembleScans srv;
+		  srv.request.begin = ros::Time(0,0);
+		  srv.request.end   = ros::Time::now();
+		  if (client.call(srv)){
+			printf("Got cloud with %u points\n", srv.response.cloud.points.size());
+			point_cloud_publisher_.publish(srv.response.cloud);
+		  }
+		  else
+			printf("Service call failed\n");
+		  //~ /\ DEBUG
+		  
+		  
+		  //printf("transmit\n");
+		  transmit_state(prev_state, pub_new_estimates);
+
+		//      printf("end\n");
+		  counter_steps++;
+		}
+
+		ros::spinOnce();
+
+		loop_rate.sleep();
+
+
+	}
+
+
+	ros::spin();
+
+	return 0;
 }

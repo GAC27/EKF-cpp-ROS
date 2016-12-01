@@ -1,8 +1,8 @@
-prefix=/home/tiago/GitHub/SistemasAutonomos/devel
+prefix=/home/gac/gazebo2-pioneer/devel
 
 Name: pioneer_gazebo
 Description: Description of pioneer_gazebo
 Version: 0.1.0
 Cflags: 
-Libs: -L/home/tiago/GitHub/SistemasAutonomos/devel/lib 
+Libs: -L/home/gac/gazebo2-pioneer/devel/lib 
 Requires: 

@@ -30,7 +30,13 @@ echo "Launching controller..."
 roslaunch pioneer_ros pioneer_controller.launch &
 pid="$pid $!"
 
-sleep 5s
+sleep 4s
+
+echo "Launching Laser Scan Assembler"
+roslaunch pioneer_ros laser_scan_assembler &
+pid="$pid $!"
+
+sleep 1s
 
 echo "Launching Map"
 rosrun moded_map_server moded_map_server gazebo5FloorMap.yaml &
