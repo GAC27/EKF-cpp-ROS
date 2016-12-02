@@ -91,9 +91,9 @@ endif()
 # flag project as catkin-based to distinguish if a find_package()-ed project is a catkin project
 set(ekf_FOUND_CATKIN_PROJECT TRUE)
 
-if(NOT "/home/gac/gazebo2-pioneer/src/ekf/include;/usr/include/eigen3 " STREQUAL " ")
+if(NOT "/home/gac/gazebo2-pioneer/src/ekf/include;/usr/include;/usr/include/eigen3 " STREQUAL " ")
   set(ekf_INCLUDE_DIRS "")
-  set(_include_dirs "/home/gac/gazebo2-pioneer/src/ekf/include;/usr/include/eigen3")
+  set(_include_dirs "/home/gac/gazebo2-pioneer/src/ekf/include;/usr/include;/usr/include/eigen3")
   foreach(idir ${_include_dirs})
     if(IS_ABSOLUTE ${idir} AND IS_DIRECTORY ${idir})
       set(include ${idir})
@@ -109,7 +109,7 @@ if(NOT "/home/gac/gazebo2-pioneer/src/ekf/include;/usr/include/eigen3 " STREQUAL
   endforeach()
 endif()
 
-set(libraries "laser_geometry")
+set(libraries "laser_geometry;/usr/lib/x86_64-linux-gnu/libboost_system.so;/usr/lib/x86_64-linux-gnu/libboost_filesystem.so;/usr/lib/x86_64-linux-gnu/libboost_thread.so;/usr/lib/x86_64-linux-gnu/libboost_date_time.so;/usr/lib/x86_64-linux-gnu/libboost_iostreams.so;/usr/lib/x86_64-linux-gnu/libboost_serialization.so;/usr/lib/x86_64-linux-gnu/libboost_chrono.so;/usr/lib/x86_64-linux-gnu/libboost_atomic.so;/usr/lib/x86_64-linux-gnu/libboost_regex.so;/usr/lib/x86_64-linux-gnu/libpthread.so")
 foreach(library ${libraries})
   # keep build configuration keywords, target names and absolute libraries as-is
   if("${library}" MATCHES "^(debug|optimized|general)$")

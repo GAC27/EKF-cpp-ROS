@@ -15,6 +15,7 @@
 #include <limits>
 #include <laser_assembler/AssembleScans.h>
 #include <laser_geometry/laser_geometry.h>
+#include <pcl_ros/point_cloud.h>
 
 using namespace laser_assembler;
 using Eigen::MatrixXd;
@@ -285,6 +286,9 @@ void transmit_laser_scan(std::vector<float> f, const sensor_msgs::LaserScan::Con
 
   // Do something with cloud.
   predicted_point_cloud_publisher_.publish(cloud);
+  for(int i = 0; i < cloud.fields.size(); i++){
+	  std::cout << "point cloud[" << i << "]=" << cloud.fields[i].offset << std::endl;
+  }
 
 }
 
