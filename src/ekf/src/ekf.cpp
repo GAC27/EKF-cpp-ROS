@@ -142,9 +142,9 @@ MatrixXd F(State prev_state, State new_state){
 
 
 MatrixXd PredictedCovariance(State prev_state, State new_state){
-	noiseQk << 0.05, 0, 0,
-			   0, 0.05, 0,
-			   0, 0, 0.05;
+	noiseQk << 0.000000001, 0, 0,
+			   0, 0.000000001, 0,
+			   0, 0, 0.000000001;
 			   
 	MatrixXd jacobi = F(prev_state,new_state);
 	MatrixXd jacobiTransposed= jacobi.transpose();
@@ -160,28 +160,6 @@ MatrixXd UpdateCovariance(MatrixXd PredictedCovariance, MatrixXd Kalman_gain, Ma
 }
 
 
-MatrixXd h(std::vector<float> distances,float theta){
-	float ang_incr= 0.005814; //Taken from the laserScan topic
-	float scan_ang= 2.090000 * 2; //Taken from the laserScan topic
-
-	float ang_start;
-	ang_start = theta - scan_ang / 2;
-
-	MatrixXd result = MatrixXd::Zero(2,72);
-	float fi;
-	int i=0;
-	int j=0;
-	for(; i < distances.size() ; i+= (distances.size()/ 72), j++){
-		fi=ang_start + ang_incr * i;
-		if(distances[floor(i)] == -1)
-			result(0,j) = std::numeric_limits<float>::infinity();
-		else
-			result(0,j) = distances[floor(i)];
-			result(1,j) = fi;
-	}
-
-	return result;
-}
 
 MatrixXd H(){
 	MatrixXd _H(3,3);
@@ -196,8 +174,6 @@ MatrixXd V(pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp){
 
 	//~ std::cout << "has converged:" << icp.hasConverged() << " score: " << 
 	//~ icp.getFitnessScore() << std::endl;
-	
-	
 	
 	MatrixXd Vvector(3,1);
 	Vvector(0,0) = (double) icpTransform(0,3);
@@ -333,9 +309,9 @@ MatrixXd S_KplusOne(MatrixXd H, MatrixXd CovarianceKplusOne ){
 	MatrixXd _S_KplusOne;
 
 	MatrixXd Rk(3,3);
-	Rk << 4.3, 0, 0,
-		    0, 4.3, 0,
-		    0, 0, 4.3;
+	Rk << 0.1, 0, 0,
+		    0, 0.1, 0,
+		    0, 0, 0.1;
 
 	_S_KplusOne = H * CovarianceKplusOne * H.transpose() + Rk;
 
@@ -390,16 +366,18 @@ void ekf_step(ros::Time time_step){
 		//Matching Step
 		pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ>  icpAligned= icp_matching(predictedPCLCloud,realPCLCloud);
 		
-		if(icpAligned.hasConverged()){
+		if(icpAligned.hasConverged()){		//Match
 			MatrixXd _V = V(icpAligned); 
 
 			//Update Step
 			prev_state=update(new_state,KkplusOne(Covariance_KplusOne, _H, SKplusOne), _V, SKplusOne);
 		}		
-		else{
-			//NO KALMAN STUFF UPDATE
+		else{ 	//No Match
+			//Update Step
+			prev_state=new_state;
+			Covariance_K=Covariance_KplusOne;
 		}
-
+		std::cout<< "Cov(K+1|K)=\n" << Covariance_K << "\nCov(K+1|K+1)=\n" << Covariance_KplusOne << std::endl;
 		prev_odom=current_odom;
 	}
 }
