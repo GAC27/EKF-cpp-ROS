@@ -1,10 +1,16 @@
 \BOOKMARK [1][-]{section.1}{Introduction}{}% 1
 \BOOKMARK [1][-]{section.2}{Methods}{}% 2
-\BOOKMARK [2][-]{subsection.2.1}{Methods XY}{section.2}% 3
-\BOOKMARK [3][-]{subsubsection.2.1.1}{Method XY-Z }{subsection.2.1}% 4
-\BOOKMARK [1][-]{section.3}{Implementation}{}% 5
-\BOOKMARK [1][-]{section.4}{Results}{}% 6
-\BOOKMARK [1][-]{section.5}{Conclusion}{}% 7
-\BOOKMARK [1][-]{section*.1}{Appendix A: Proof of the First Zonklar Equation}{}% 8
-\BOOKMARK [1][-]{section*.2}{Appendix B}{}% 9
-\BOOKMARK [1][-]{section*.4}{References}{}% 10
+\BOOKMARK [2][-]{subsection.2.1}{Robot Operating System}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Mapping}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Simulation}{section.2}% 5
+\BOOKMARK [1][-]{section.3}{Implementation}{}% 6
+\BOOKMARK [2][-]{subsection.3.1}{Prediction}{section.3}% 7
+\BOOKMARK [3][-]{subsubsection.3.1.1}{State Prediction}{subsection.3.1}% 8
+\BOOKMARK [3][-]{subsubsection.3.1.2}{Observation Prediction}{subsection.3.1}% 9
+\BOOKMARK [2][-]{subsection.3.2}{Matching}{section.3}% 10
+\BOOKMARK [2][-]{subsection.3.3}{Update}{section.3}% 11
+\BOOKMARK [1][-]{section.4}{Results}{}% 12
+\BOOKMARK [1][-]{section.5}{Conclusion}{}% 13
+\BOOKMARK [1][-]{section*.3}{Appendix A: Proof of the First Zonklar Equation}{}% 14
+\BOOKMARK [1][-]{section*.4}{Appendix B}{}% 15
+\BOOKMARK [1][-]{section*.6}{References}{}% 16

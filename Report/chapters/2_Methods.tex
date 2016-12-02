@@ -5,16 +5,34 @@
 % 2. Methods and Algorithms (brief explanation of the methods used and ROS packages/algorithms used - this is mainly to make sure you understood the conceptual and the implementation part, and to introduce notation - do not write like in a book or tutorial paper)
 %%%%%%%%%%%%%%%%%%%%%%%
 
-The used methods will be described here. To fill the document the IST Wikipedia article is quoted. Enjoy it.
+\subsection{Robot Operating System}
+\label{subsec:ROS}
 
-Instituto Superior Técnico (IST) is a school of engineering,[2] part of the Universidade de Lisboa (University of Lisbon). Founded in 1911, IST is the largest and most prestigious school of engineering in Portugal. It is a public school with a large degree of scientific and financial autonomy
+The Robot Operating System is a set of software libraries and tools that helps building robot applications. It is a modularized, portable and standard system which allows it to be developed by different system designers, and has a wide range of uses, from quadcopters to industrial-type robotic manipulators. 
 
-\subsection{Methods XY}
-\label{subsec:Methods XY}
-Methods XY are used to show how to use subsection
-IST, since its foundation, has been the largest school of engineering, science and technology in Portugal, at undergraduate and postgraduate levels. It has three campi, all located in the Greater Lisbon area (Alameda in Lisbon, Taguspark in Oeiras and Tecnológico e Nuclear Campus in Loures), and consists of ten Departments that are responsible for teaching the undergraduate and postgraduate programmes. Each Department is organised in sections, which group together specific subjects within its scientific area. In addition, the laboratories of the several Departments are an important source of support to the teaching and research activities carried out at IST.
+ROS is mainly composed by 4 elements:
+\begin{itemize}
+\item Roscore -- main program, which acts primarily as a name server
+\item Node –- process that uses ROS framework and preforms a specific task
+\item Topic -– mechanism to send messages from a node to one or more nodes. Follows publisher-subscriber design pattern
+\item Service -- mechanism for a node to send a request to another node and receive a response in return.
+\end{itemize}
+In order to develop the project, several ROS packages were downloaded. A Package is a self-contained directory containing sources, makefiles, builds and others. Below there is a list of the main packages used in this project.
+\begin{itemize}
+\item rosaria -- ROS interface for the pioneer 3DX robot. It allows issuing commands to the robot wheel motors as well as retrieving information on the odometric sensors.
+\item teleop\_twist\_keyboard -- Provides teleoperation using a keyboard. Two computers are communicating through a wireless internet connection; the second computer’s keyboard is used to remotely control the robot, connected to the first computer. 
+\item slam\_gmapping -- Provides laser-based SLAM (Simultaneous Localization and Mapping), elaborating a 2-D occupancy grid map from laser and pose data collected by the LRF and the Pioneer robot.
+\item map\_server -- Provides a map\_server ROS Node, which offers map data as a ROS Service. It also provides the map\_saver command-line utility, which allows dynamically generated maps to be saved to file.
+\item rviz -- visualizing tool for displaying sensor data and state information from ROS.
+\item tf -- Used to keep track of the robots frame in relation to the static world reference
+\item laser\_assembler -- Provides nodes to assemble point clouds from the LaserScan messages.
+\end{itemize}
 
-\subsubsection{Method XY-Z }
-\label{subsubsec:Methods XY-Z}
-Method XY-Z demonstrates how to use subsubsections.
-IST offers 18 undergraduate programmes attended by more than 6,000 students, covering a wide range of areas of knowledge, including not only all the traditional engineering specializations, but also other modern areas such as Biomedical Engineering, Aerospace and Physics Engineering. Over 4,500 students are enrolled in 33 masters, 31 doctoral and several specialized programmes.[citation needed] IST has produced 1,292 Ph.D. holders.[citation needed]
+
+\subsection{Mapping}
+\label{subsec:mapping}
+The LRF was fitted on top of the Pioneer P3-DX unit, both connected to one computer using the rosaria, slam\_gmapping, map\_server, rviz and tf packages. Through the slam\_gmapping the map was generated, being stored with the map\_server package. The rviz was used to visualize the mapping and the current robot position, based on the odometry, and the tf was used to keep the localization of the robot in the map reference. A second computer was used with the teleop\_twist\_package to control the robot from a distance. The final map was obtained using certain landmarks, which made it possible to go around the odometry imprecision.
+
+\subsection{Simulation}
+\label{subsec:simulation}
+Gazebo software was used during the development of the code to test the behavior of the robot in a controlled environment without having to use the real robot. This expedited the code testing.

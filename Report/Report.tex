@@ -106,12 +106,19 @@
 % The documentation is contained in the cite.sty file itself.
 
 
-
+%\usepackage{geometry}
+\usepackage{caption} 
+\usepackage{pgfplots}
+\usepackage{icomma}
+\usepackage{amsmath,amssymb,amstext}
+\pgfplotsset{compat=1.13}
 
 
 
 % *** GRAPHICS RELATED PACKAGES ***
 %
+\usepackage{graphicx, wrapfig}
+%\usepackage{subcaption}
 \ifCLASSINFOpdf
   % \usepackage[pdftex]{graphicx}
   % declare the path(s) where your graphic files are
@@ -194,7 +201,9 @@
 
 % *** ALIGNMENT PACKAGES ***
 %
-%\usepackage{array}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
 % Frank Mittelbach's and David Carlisle's array.sty patches and improves
 % the standard LaTeX2e array and tabular environments to provide better
 % appearance and additional user controls. As the default LaTeX2e table
@@ -339,6 +348,11 @@
 % http://www.ctan.org/pkg/url
 % Basically, \url{my_url_here}.
 
+% NEW COMMANDS
+
+\newcommand{\icol}[1]{% inline column vector
+  \left(\begin{smallmatrix}#1\end{smallmatrix}\right)%
+}
 
 
 
@@ -373,7 +387,7 @@
 % was not built to handle multiple paragraphs
 %
 
-\author{Gonçalo~Castilho~(75305),
+\author{Gon\c{c}alo~Castilho~(75305),
 		Tiago~Gomes~(76079), 
         Pedro~Sousa~(79205),
         and Markus~K\"uhlen~(85746)}% <-this % stops a space
