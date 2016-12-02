@@ -17,8 +17,14 @@
 #include <laser_geometry/laser_geometry.h>
 #include <pcl_ros/point_cloud.h>
 
+#include <iostream>
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
+#include <pcl/registration/icp.h>
+
 using namespace laser_assembler;
 using Eigen::MatrixXd;
+using Eigen::MatrixXf;
 
 
 class State{
@@ -74,6 +80,9 @@ State* current_odom = NULL;
 nav_msgs::OccupancyGrid::ConstPtr occupancyGrid;
 sensor_msgs::LaserScan::ConstPtr scan;
 
+pcl::PointCloud<pcl::PointXYZ>::Ptr realPCLCloud;
+pcl::PointCloud<pcl::PointXYZ>::Ptr predictedPCLCloud;
+
 MatrixXd noiseQk = MatrixXd::Zero(3,3);
 MatrixXd Covariance_KplusOne = MatrixXd::Zero(3,3);
 MatrixXd Covariance_K = MatrixXd::Zero(3,3);
@@ -84,15 +93,17 @@ ros::Publisher predicted_point_cloud_publisher_;
 
 laser_geometry::LaserProjection projector;
 tf::TransformListener* listener;
+void icp_matching(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_in, pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_out);
+
 
 //~ DEBUG
-pcl::PointCloud<pcl::PointXYZ> ConvertFromPointCloud2ToPCL(sensor_msgs::PointCloud2 msg) {
+pcl::PointCloud<pcl::PointXYZ>::Ptr ConvertFromPointCloud2ToPCL(sensor_msgs::PointCloud2 msg) {
     pcl::PCLPointCloud2 pcl_pc2;
     pcl_conversions::toPCL(msg,pcl_pc2);
     pcl::PointCloud<pcl::PointXYZ>::Ptr temp_cloud(new pcl::PointCloud<pcl::PointXYZ>);
     pcl::fromPCLPointCloud2(pcl_pc2,*temp_cloud);
 	//do stuff with temp_cloud here
-	return *temp_cloud;
+	return temp_cloud;
 }
 //~ DEBUG
 
@@ -289,7 +300,7 @@ void transmit_laser_scan(std::vector<float> f, const sensor_msgs::LaserScan::Con
   
   sensor_msgs::PointCloud2 cloud;
   projector.transformLaserScanToPointCloud("base_link",scan, cloud,*listener);
-  pcl::PointCloud<pcl::PointXYZ> pclCloud = ConvertFromPointCloud2ToPCL(cloud);
+  predictedPCLCloud = ConvertFromPointCloud2ToPCL(cloud);
 
   // Do something with cloud.
   predicted_point_cloud_publisher_.publish(cloud);
@@ -421,6 +432,8 @@ void ekf_step(ros::Time time_step){
 		//Prediction Step
 		MatrixXd predictedZ  = prediction(time_step);
 
+		icp_matching(realPCLCloud,predictedPCLCloud);
+		
 		std::vector<MatrixXd> _H = H(predictedZ,*new_state);
 
 		std::vector<MatrixXd> SKplusOne = S_KplusOne( _H, Covariance_KplusOne);
@@ -490,8 +503,33 @@ void map_receiver(const nav_msgs::OccupancyGrid::ConstPtr& msg){
   Map_Active=true;
 }
 
+///Receives a two PCL point clouds. cloud_in is the Predicted Observation and cloud_out is the Real Observation
+void icp_matching(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_in, pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_out){
+	pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;
+	
+	icp.setInputSource(cloud_in);	//Predicted Observation
+	icp.setInputTarget(cloud_out); 	//Real Observation
+	
+	pcl::PointCloud<pcl::PointXYZ> Final;
+	icp.align(Final);
 
+	MatrixXf icpTransform = icp.getFinalTransformation();
 
+	std::cout << "has converged:" << icp.hasConverged() << " score: " << 
+	icp.getFitnessScore() << std::endl;
+	std::cout << icpTransform << std::endl;
+	
+	
+	
+	MatrixXd Vvector(3,1);
+	Vvector(0,0) = (double) icpTransform(0,3);
+	
+	Vvector(1,0) = (double) icpTransform(1,3);
+	
+	Vvector(2,0) = atan2((double) icpTransform(0,1), (double) icpTransform(0,0));
+	
+	std::cout << Vvector << std::endl;
+}
 
 
 void transmit_state(State* s, ros::Publisher odom_pub)
@@ -541,14 +579,11 @@ void scan_receiver(const sensor_msgs::LaserScan::ConstPtr& msg){
 	projector.transformLaserScanToPointCloud("base_link",*msg, cloud,*listener);
 	
 	
-	pcl::PointCloud<pcl::PointXYZ> pclCloud = ConvertFromPointCloud2ToPCL(cloud);
+	realPCLCloud = ConvertFromPointCloud2ToPCL(cloud);
 
 	// Do something with cloud.
 	real_point_cloud_publisher_.publish(cloud);
-
-	for(int i = 0; i < pclCloud.size(); i++){
-		std::cout << "point cloud[" << i << "]=(" << pclCloud[i].x << "," << pclCloud[i].y << "," << pclCloud[i].z << ")"  << std::endl;
-	}
+	
 }
 
 int main(int argc, char **argv)
