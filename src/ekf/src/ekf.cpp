@@ -82,13 +82,19 @@ ros::Publisher publisher_scan;
 ros::Publisher real_point_cloud_publisher_;
 ros::Publisher predicted_point_cloud_publisher_;
 
-//~ DEBUG
 laser_geometry::LaserProjection projector;
 tf::TransformListener* listener;
 
-
 //~ DEBUG
-
+pcl::PointCloud<pcl::PointXYZ> ConvertFromPointCloud2ToPCL(sensor_msgs::PointCloud2 msg) {
+    pcl::PCLPointCloud2 pcl_pc2;
+    pcl_conversions::toPCL(msg,pcl_pc2);
+    pcl::PointCloud<pcl::PointXYZ>::Ptr temp_cloud(new pcl::PointCloud<pcl::PointXYZ>);
+    pcl::fromPCLPointCloud2(pcl_pc2,*temp_cloud);
+	//do stuff with temp_cloud here
+	return *temp_cloud;
+}
+//~ DEBUG
 
 int counter_steps = 0;
 
@@ -283,12 +289,11 @@ void transmit_laser_scan(std::vector<float> f, const sensor_msgs::LaserScan::Con
   
   sensor_msgs::PointCloud2 cloud;
   projector.transformLaserScanToPointCloud("base_link",scan, cloud,*listener);
+  pcl::PointCloud<pcl::PointXYZ> pclCloud = ConvertFromPointCloud2ToPCL(cloud);
 
   // Do something with cloud.
   predicted_point_cloud_publisher_.publish(cloud);
-  for(int i = 0; i < cloud.fields.size(); i++){
-	  std::cout << "point cloud[" << i << "]=" << cloud.fields[i].offset << std::endl;
-  }
+  
 
 }
 
@@ -531,12 +536,19 @@ void transmit_state(State* s, ros::Publisher odom_pub)
 
 
 void scan_receiver(const sensor_msgs::LaserScan::ConstPtr& msg){
-  scan=msg;
-  sensor_msgs::PointCloud2 cloud;
-  projector.transformLaserScanToPointCloud("base_link",*msg, cloud,*listener);
+	scan=msg;
+	sensor_msgs::PointCloud2 cloud;
+	projector.transformLaserScanToPointCloud("base_link",*msg, cloud,*listener);
+	
+	
+	pcl::PointCloud<pcl::PointXYZ> pclCloud = ConvertFromPointCloud2ToPCL(cloud);
 
-  // Do something with cloud.
-  real_point_cloud_publisher_.publish(cloud);
+	// Do something with cloud.
+	real_point_cloud_publisher_.publish(cloud);
+
+	for(int i = 0; i < pclCloud.size(); i++){
+		std::cout << "point cloud[" << i << "]=(" << pclCloud[i].x << "," << pclCloud[i].y << "," << pclCloud[i].z << ")"  << std::endl;
+	}
 }
 
 int main(int argc, char **argv)
