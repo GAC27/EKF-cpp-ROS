@@ -16,11 +16,22 @@
 #include <laser_assembler/AssembleScans.h>
 #include <laser_geometry/laser_geometry.h>
 #include <pcl_ros/point_cloud.h>
-
 #include <iostream>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pcl/registration/icp.h>
+#include <pcl/registration/correspondence_estimation.h>
+#include <pcl/registration/correspondence_rejection_distance.h>
+#include <pcl/registration/correspondence_rejection_median_distance.h>
+#include <pcl/registration/correspondence_rejection_surface_normal.h>
+#include <pcl/registration/correspondence_rejection.h>
+#include <pcl/registration/correspondence_rejection_one_to_one.h>
+#include <pcl/registration/correspondence_rejection_sample_consensus.h>
+#include <pcl/registration/correspondence_rejection_trimmed.h>
+#include <pcl/registration/correspondence_rejection_var_trimmed.h>
+#include <pcl/registration/transformation_estimation_lm.h>
+#include <pcl/registration/transformation_estimation_svd.h>
+#include <pcl/features/normal_3d.h>
 
 using namespace laser_assembler;
 using Eigen::MatrixXd;
@@ -126,10 +137,13 @@ float get_velocity(float new_x, float prev_x, double delta_time){
 }
 
 State* f(State* prevState,State* odomState, State* currentOdom, ros::Time time_now){
-  float x = currentOdom->x - odomState->x + prevState->x;
-  float y = currentOdom->y - odomState->y + prevState->y;
-  float theta = currentOdom->theta - odomState->theta + prevState->theta;
-  return new State(x,y,theta, time_now);  
+	float x = currentOdom->x - odomState->x + prevState->x;
+	float y = currentOdom->y - odomState->y + prevState->y;
+	float theta = currentOdom->theta - odomState->theta + prevState->theta;
+	std::cout << "Difference of X: " << currentOdom->x - odomState->x << std::endl;
+	std::cout << "Difference of Y: " << currentOdom->y - odomState->y << std::endl; 
+	std::cout << "Difference of Theta: " << currentOdom->theta - odomState->theta << std::endl;
+	return new State(x,y,theta, time_now);  
 }
 
 MatrixXd F(State prev_state, State new_state){
@@ -141,10 +155,15 @@ MatrixXd F(State prev_state, State new_state){
 }
 
 
-MatrixXd PredictedCovariance(State prev_state, State new_state){
-	noiseQk << 0.000000001, 0, 0,
-			   0, 0.000000001, 0,
-			   0, 0, 0.000000001;
+MatrixXd PredictedCovariance(State prev_state, State new_state, State* currentOdom, State* odomState){
+	
+	
+	double noiseOdomX = 0.001 * (currentOdom->x - odomState->x);
+	double noiseOdomY = 0.001 * (currentOdom->y - odomState->y);
+	double noiseTheta = 0.0011 * (currentOdom->theta - odomState->theta);
+	noiseQk << 0.001 + noiseOdomX, 0, 0,
+			   0, 0.001 + noiseOdomY, 0,
+			   0, 0, 0.001 + noiseTheta;
 			   
 	MatrixXd jacobi = F(prev_state,new_state);
 	MatrixXd jacobiTransposed= jacobi.transpose();
@@ -155,8 +174,16 @@ MatrixXd PredictedCovariance(State prev_state, State new_state){
 
 
 MatrixXd UpdateCovariance(MatrixXd PredictedCovariance, MatrixXd Kalman_gain, MatrixXd _S_KplusOne){
-	
-	return (PredictedCovariance - Kalman_gain * _S_KplusOne * Kalman_gain.transpose());
+	MatrixXd identity(3,3);
+	identity <<  1, 0, 0,
+				 0, 1, 0,
+				 0, 0, 1;
+	std::cout << "Update Covarince" << std::endl;
+	std::cout << "Kalman Gain" << Kalman_gain << std::endl;
+	std::cout << "PredictedCovariance" <<  PredictedCovariance << std::endl;
+	std::cout << "UpdateCovariance Before returning" <<  (identity - Kalman_gain) * PredictedCovariance << std::endl;
+	std::cout << "PredictedCovariance Ended" << std::endl;
+	return (identity - Kalman_gain) * PredictedCovariance;
 }
 
 
@@ -276,7 +303,7 @@ void prediction(ros::Time time_step){
 
 	new_state = f(prev_state,prev_odom, current_odom, time_step);
 
-	Covariance_KplusOne = PredictedCovariance(*prev_state, *new_state);
+	Covariance_KplusOne = PredictedCovariance(*prev_state, *new_state, current_odom, prev_odom);
 	
 	std::vector<float> predictedObservation = raycast(*new_state);
 	transmit_laser_scan(predictedObservation, scan, publisher_scan);
@@ -299,8 +326,12 @@ State* update(State* new_state, MatrixXd kalman_Gain, MatrixXd V_matrix, MatrixX
 
 //Kalman Gain
 MatrixXd KkplusOne(MatrixXd CovarianceKplusOne,MatrixXd H, MatrixXd S_KplusOne){
-
-	return CovarianceKplusOne * H.transpose() * S_KplusOne.inverse();
+	MatrixXd Rk(3,3);
+	Rk << 0.02, 0, 0,
+		    0, 0.02, 0,
+		    0, 0, 0.02;
+	
+	return CovarianceKplusOne * (CovarianceKplusOne + Rk).inverse();
 }
 
 
@@ -309,9 +340,9 @@ MatrixXd S_KplusOne(MatrixXd H, MatrixXd CovarianceKplusOne ){
 	MatrixXd _S_KplusOne;
 
 	MatrixXd Rk(3,3);
-	Rk << 0.1, 0, 0,
-		    0, 0.1, 0,
-		    0, 0, 0.1;
+	Rk << 0.01, 0, 0,
+		    0, 0.01, 0,
+		    0, 0, 0.01;
 
 	_S_KplusOne = H * CovarianceKplusOne * H.transpose() + Rk;
 
@@ -350,9 +381,9 @@ void ekf_step(ros::Time time_step){
 		float theta = current_odom->theta;
 		prev_state = new State(x,y,theta, time_step);
 		prev_odom = new State(x,y,theta,time_step);
-		Covariance_K << 0.02, 0, 0,
-						0, 0.02, 0,
-						0, 0, 0.02;
+		Covariance_K << 0.002, 0, 0,
+						0, 0.002, 0,
+						0, 0, 0.002;
 	}
 	else
 	{
@@ -362,13 +393,17 @@ void ekf_step(ros::Time time_step){
 		MatrixXd _H = H();
 
 		MatrixXd SKplusOne = S_KplusOne( _H, Covariance_KplusOne);
-
+		
 		//Matching Step
 		pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ>  icpAligned= icp_matching(predictedPCLCloud,realPCLCloud);
-		
-		if(icpAligned.hasConverged()){		//Match
+		boost::shared_ptr<pcl::Correspondences> correspondences (new pcl::Correspondences);
+		pcl::registration::CorrespondenceEstimation<pcl::PointXYZ, pcl::PointXYZ> corr_est;
+		corr_est.setInputCloud (predictedPCLCloud);
+		corr_est.setInputTarget (realPCLCloud);
+		corr_est.determineCorrespondences (*correspondences);
+		if(icpAligned.hasConverged() && correspondences->size() >= 600){		//Match
 			MatrixXd _V = V(icpAligned); 
-
+			std::cout << "V: " << _V << std::endl;
 			//Update Step
 			prev_state=update(new_state,KkplusOne(Covariance_KplusOne, _H, SKplusOne), _V, SKplusOne);
 		}		
@@ -377,8 +412,12 @@ void ekf_step(ros::Time time_step){
 			prev_state=new_state;
 			Covariance_K=Covariance_KplusOne;
 		}
-		std::cout<< "Cov(K+1|K)=\n" << Covariance_K << "\nCov(K+1|K+1)=\n" << Covariance_KplusOne << std::endl;
+		
+		std::cout<< "Kalman Gain: " << KkplusOne(Covariance_KplusOne, _H, SKplusOne) << std::endl;
+		std::cout<< "Cov(K+1|K)=\n" << Covariance_KplusOne << "\nCov(K+1|K+1)=\n" << Covariance_K << std::endl;
+		std::cout<< (correspondences->size()) << std::endl;
 		prev_odom=current_odom;
+		
 	}
 }
 
@@ -419,6 +458,9 @@ void map_receiver(const nav_msgs::OccupancyGrid::ConstPtr& msg){
 pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp_matching(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_in, pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_out){
 	pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;
 	
+	icp.setMaxCorrespondenceDistance(0.005);// Change Value
+	icp.setEuclideanFitnessEpsilon(1000); // Change value
+	icp.setMaximumIterations(700);
 	icp.setInputSource(cloud_in);	//Predicted Observation
 	icp.setInputTarget(cloud_out); 	//Real Observation
 	
@@ -470,18 +512,31 @@ void transmit_state(State* s, ros::Publisher odom_pub)
   
 }
 
+void bla(){
+	sensor_msgs::LaserScan laser_scan;
+	laser_scan.header = scan->header;
+	laser_scan.angle_min = scan->angle_min;
+	laser_scan.angle_max = scan->angle_max;
+	laser_scan.angle_increment = scan->angle_increment;
+	laser_scan.time_increment = scan->time_increment;
+	laser_scan.range_min = scan->range_min;
+	laser_scan.range_max = scan->range_max;
+	laser_scan.ranges = scan->ranges;
+	laser_scan.intensities = scan->intensities;
+
+	ros::Time time_n = ros::Time::now();
+	sensor_msgs::PointCloud2 cloud;
+	laser_scan.header.stamp = time_n;
+	projector.transformLaserScanToPointCloud("base_link",laser_scan, cloud,*listener);
+	realPCLCloud = ConvertFromPointCloud2ToPCL(cloud);
+	// Do something with cloud.
+	real_point_cloud_publisher_.publish(cloud);
+}
+
 
 void scan_receiver(const sensor_msgs::LaserScan::ConstPtr& msg){
 	scan=msg;
-	sensor_msgs::PointCloud2 cloud;
-	projector.transformLaserScanToPointCloud("base_link",*msg, cloud,*listener);
-	
-	
-	realPCLCloud = ConvertFromPointCloud2ToPCL(cloud);
-
-	// Do something with cloud.
-	real_point_cloud_publisher_.publish(cloud);
-	
+	bla();
 }
 
 int main(int argc, char **argv)
@@ -501,7 +556,6 @@ int main(int argc, char **argv)
 	publisher_scan = n.advertise<sensor_msgs::LaserScan>("bla_scan", 50);
 	predicted_point_cloud_publisher_ = n.advertise<sensor_msgs::PointCloud2> ("predicted_scan_cloud", 100, false);
 	real_point_cloud_publisher_ = n.advertise<sensor_msgs::PointCloud2> ("base_scan_cloud", 100, false);
-
 	ros::Rate loop_rate(10);   
 
 	while (ros::ok())
