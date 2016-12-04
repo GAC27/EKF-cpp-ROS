@@ -17,6 +17,7 @@
 #include <laser_geometry/laser_geometry.h>
 #include <pcl_ros/point_cloud.h>
 #include <iostream>
+#include <visualization_msgs/Marker.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pcl/registration/icp.h>
@@ -101,6 +102,7 @@ MatrixXd map;
 ros::Publisher publisher_scan;
 ros::Publisher real_point_cloud_publisher_;
 ros::Publisher predicted_point_cloud_publisher_;
+ros::Publisher location_undertainty;
 
 laser_geometry::LaserProjection projector;
 tf::TransformListener* listener;
@@ -136,6 +138,50 @@ float get_velocity(float new_x, float prev_x, double delta_time){
   return distance / delta_time;
 }
 
+
+void drawCovariance(const Eigen::Matrix2f& covMatrix)
+{
+    visualization_msgs::Marker tempMarker;
+    tempMarker.pose.position.x = 0;
+    tempMarker.pose.position.y = 0;
+
+    Eigen::SelfAdjointEigenSolver<Eigen::Matrix2f> eig(covMatrix);
+
+    const Eigen::Vector2f& eigValues (eig.eigenvalues());
+    const Eigen::Matrix2f& eigVectors (eig.eigenvectors());
+
+    float angle = (atan2(eigVectors(1, 0), eigVectors(0, 0)));
+
+
+    tempMarker.type = visualization_msgs::Marker::SPHERE;
+
+    double lengthMajor = sqrt(eigValues[0]);
+    double lengthMinor = sqrt(eigValues[1]);
+
+    tempMarker.scale.x = 3.0*lengthMajor;
+    tempMarker.scale.y = 3.0*lengthMinor;
+    tempMarker.scale.z = 0.001;
+
+    tempMarker.color.a = 1.0;
+    tempMarker.color.r = 1.0;
+	
+	tempMarker.pose.position.x = new_state->x;
+	tempMarker.pose.position.y = new_state->y;
+	tempMarker.pose.position.z = 0.5;
+	
+    tempMarker.pose.orientation.w = cos(angle*0.5);
+    tempMarker.pose.orientation.z = sin(angle*0.5);
+
+    tempMarker.header.frame_id="odom";
+    tempMarker.id = 0;
+
+    location_undertainty.publish(tempMarker);
+}
+
+
+
+
+
 State* f(State* prevState,State* odomState, State* currentOdom, ros::Time time_now){
 	float x = currentOdom->x - odomState->x + prevState->x;
 	float y = currentOdom->y - odomState->y + prevState->y;
@@ -158,12 +204,12 @@ MatrixXd F(State prev_state, State new_state){
 MatrixXd PredictedCovariance(State prev_state, State new_state, State* currentOdom, State* odomState){
 	
 	
-	double noiseOdomX = 0.001 * (currentOdom->x - odomState->x);
-	double noiseOdomY = 0.001 * (currentOdom->y - odomState->y);
-	double noiseTheta = 0.0011 * (currentOdom->theta - odomState->theta);
-	noiseQk << 0.001 + noiseOdomX, 0, 0,
-			   0, 0.001 + noiseOdomY, 0,
-			   0, 0, 0.001 + noiseTheta;
+	double noiseOdomX = 0.001 * std::abs(currentOdom->x - odomState->x);
+	double noiseOdomY = 0.001 * std::abs(currentOdom->y - odomState->y);
+	double noiseTheta = 0.0011 * std::abs(currentOdom->theta - odomState->theta);
+	noiseQk << 0.0005 + noiseOdomX, 0, 0,
+			   0, 0.0005 + noiseOdomY, 0,
+			   0, 0, 0.0005 + noiseTheta;
 			   
 	MatrixXd jacobi = F(prev_state,new_state);
 	MatrixXd jacobiTransposed= jacobi.transpose();
@@ -327,9 +373,9 @@ State* update(State* new_state, MatrixXd kalman_Gain, MatrixXd V_matrix, MatrixX
 //Kalman Gain
 MatrixXd KkplusOne(MatrixXd CovarianceKplusOne,MatrixXd H, MatrixXd S_KplusOne){
 	MatrixXd Rk(3,3);
-	Rk << 0.02, 0, 0,
-		    0, 0.02, 0,
-		    0, 0, 0.02;
+	Rk << 0.008, 0, 0,
+		    0, 0.008, 0,
+		    0, 0, 0.008;
 	
 	return CovarianceKplusOne * (CovarianceKplusOne + Rk).inverse();
 }
@@ -413,6 +459,13 @@ void ekf_step(ros::Time time_step){
 			Covariance_K=Covariance_KplusOne;
 		}
 		
+		Eigen::Matrix2f covMatrix;
+		covMatrix(0,0)=Covariance_K(1,1);
+        covMatrix(0,1)=Covariance_K(1,2);
+        covMatrix(1,0)=Covariance_K(2,1);
+        covMatrix(1,1)=Covariance_K(2,2);
+		drawCovariance(covMatrix);
+		
 		std::cout<< "Kalman Gain: " << KkplusOne(Covariance_KplusOne, _H, SKplusOne) << std::endl;
 		std::cout<< "Cov(K+1|K)=\n" << Covariance_KplusOne << "\nCov(K+1|K+1)=\n" << Covariance_K << std::endl;
 		std::cout<< (correspondences->size()) << std::endl;
@@ -457,15 +510,19 @@ void map_receiver(const nav_msgs::OccupancyGrid::ConstPtr& msg){
 ///Receives a two PCL point clouds. cloud_in is the Predicted Observation and cloud_out is the Real Observation
 pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp_matching(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_in, pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_out){
 	pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;
-	
-	icp.setMaxCorrespondenceDistance(0.005);// Change Value
-	icp.setEuclideanFitnessEpsilon(1000); // Change value
-	icp.setMaximumIterations(700);
 	icp.setInputSource(cloud_in);	//Predicted Observation
 	icp.setInputTarget(cloud_out); 	//Real Observation
+	icp.setMaxCorrespondenceDistance(0.001);//
+	icp.setMaximumIterations(700); // First Criteria
+	icp.setTransformationEpsilon(1e-7); //Second Criteria
+	//icp.setEuclideanFitnessEpsilon(0.0001); // Third Criteria
+	icp.setRANSACIterations (1000);
+	icp.setRANSACOutlierRejectionThreshold(0.1);
+	
 	
 	pcl::PointCloud<pcl::PointXYZ> Final;
 	icp.align(Final);
+	real_point_cloud_publisher_.publish(Final);
 	
 	return icp;
 }
@@ -530,7 +587,7 @@ void bla(){
 	projector.transformLaserScanToPointCloud("base_link",laser_scan, cloud,*listener);
 	realPCLCloud = ConvertFromPointCloud2ToPCL(cloud);
 	// Do something with cloud.
-	real_point_cloud_publisher_.publish(cloud);
+	//real_point_cloud_publisher_.publish(cloud);
 }
 
 
@@ -556,6 +613,7 @@ int main(int argc, char **argv)
 	publisher_scan = n.advertise<sensor_msgs::LaserScan>("bla_scan", 50);
 	predicted_point_cloud_publisher_ = n.advertise<sensor_msgs::PointCloud2> ("predicted_scan_cloud", 100, false);
 	real_point_cloud_publisher_ = n.advertise<sensor_msgs::PointCloud2> ("base_scan_cloud", 100, false);
+	location_undertainty = n.advertise<visualization_msgs::Marker>("/location_undertainty",1);
 	ros::Rate loop_rate(10);   
 
 	while (ros::ok())
