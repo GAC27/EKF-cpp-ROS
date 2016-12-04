@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package>
+  <name>teleop_twist_keyboard_rosaria</name>
+  <version>0.6.0</version>
+  <description>Generic keyboard teleop for twist robots.</description>
+
+  <maintainer email="namniart@gmail.com">Austin Hendrix</maintainer>
+
+  <license>BSD</license>
+  
+  <author>Graylin Trevor Jay</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>rospy</run_depend>
+</package>
