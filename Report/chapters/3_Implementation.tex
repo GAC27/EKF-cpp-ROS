@@ -17,7 +17,8 @@ This section describes how the EKF with it's three basic steps has been implemen
 The robot's state $X$ is defined as it's current two dimensional pose. The observation $Z$ used for the Extended Kalman filter, like explained in section \ref{subsec:Matching}, also includes variables to describe a pose. 
 \begin{align}
 X&=\begin{pmatrix}x_s & y_s & \theta_s \end{pmatrix}^T \label{eq:state_def} \\
-Z&=\begin{pmatrix}x_{obs} & y_{obs} & \theta_{obs} \end{pmatrix}^T \label{eq:observation_def}
+Z&=\begin{pmatrix}x_{obs} & y_{obs} & \theta_{obs} \end{pmatrix}^T \\
+V&=Z(k+1)-\hat{Z}(k+1)=\begin{pmatrix} \Delta x_{v} & \Delta y_{v} & \Delta \theta_{v} \end{pmatrix}^T \label{eq:observation_def}
 \end{align}
 
 With the state and the observation being a 3 by 1 vector, the dimensions of all the variables used in the EKF are defined. Table \ref{tab:Variables_def} lists the used variables with their symbols, dimensions and a short description..
@@ -28,6 +29,7 @@ With the state and the observation being a 3 by 1 vector, the dimensions of all 
 Symbol & Dimension & Description \\
 \midrule
 $X$ & 3 x 1 & State vector - Robot pose \\
+$v$ & 3 x 1 & ???? \\
 $Z$ & 3 x 1 & Observation \\
 $\Sigma$ & 3 x 3 & Robot state covariance  \\
 $f$ & 3 x 1 & Robot motion model function \\
@@ -47,28 +49,60 @@ $K$ & 3 x 3 & Kalman gain \\
 
 \subsection{Prediction}
 \label{subsec:Prediction}
-The aim of the EKF prediction step is to receive the updated state and covariance and then from there on determine the predicted observation for the next time step $\widehat{Z}_i(k+1|k)$. To do so, the motion model predicts the future state in the next time step $\widehat{X}(k+1|1)$ and the corresponding covariance matrix $\Sigma_X (k+1|k)$. From there on it is possible for the observation model to obtain the predicted observation $\widehat{Z}_i(k+1|k)$. 
+The aim of the EKF prediction step is to receive the updated state and covariance and then from there on determine the predicted observation for the next time step $\hat{Z}_i(k+1|k)$. To do so, the motion model predicts the future state in the next time step $\hat{X}(k+1|1)$ and the corresponding covariance matrix $\Sigma_X (k+1|k)$. From there on it is possible for the observation model to obtain the predicted observation $\hat{Z}_i(k+1|k)$. 
 The motion and observation model need to be defined by the user depending on the problem and solution approach.
 \subsubsection{State Prediction}
 \label{subsubsec:subsubsection_Tag}
+One of the main ideas of the EKF lies in linearising the motion and measurement model.
+For the state prediction, the motion model is decomposed a the noise-free part in  \eqref{eq:state_predict_def} and a random noise component with zero mean in equation \eqref{eq:cov_predict_def}.
+\begin{align}
+\hat{X}(k+1|k) &= f(\hat{X}(k),~U(k)) \label{eq:state_predict_def} \\
+\Sigma_{X}(k+1|k) &= F \Sigma_{X}(k|k) F^{T} + Q(k) \label{eq:cov_predict_def} 
+\end{align}
 As the considered robot is a three-wheeled vehicle that drives in a planar two dimensional environment, a motion model can be developed for specifically for this case. The Pioneer 3DX is steered by giving different speed commands to the left and right wheel. Therefore, the motion input vector is defined as in \eqref{eq:input}.
- 
 \begin{equation}
 U=\begin{pmatrix}\omega_{Right} & \omega_{Left} \end{pmatrix}^T \label{eq:input}
 \end{equation}
-\noindent \begin{tabularx}{\textwidth}{@{}XXX@{}}
-\begin{equation} 
+\noindent\begin{minipage}{.53\linewidth}
+\centering
+\begin{equation}
 \beta=\frac{\omega_{Right}-\omega_{Left}}{d} \label{eq:beta}
-\end{equation} &
+\end{equation}
+\end{minipage}%
+\begin{minipage}{.38\linewidth}
+\centering
 \begin{equation}
 R=\frac{\omega_{Left}}{\beta} \label{eq:R}
 \end{equation}
-\end{tabularx}
-With the help of $d$, the distance between the robot's driven wheels, and the defined parameters $R$ and $\beta$ in \eqref{eq:beta} respectively \eqref{eq:R}, it is possible to formulate the motion model in equation \eqref{eq:MotionModel}.
-\begin{align}
-&X(k+1|k)=f(X(k),~U(k)) \nonumber\\ &= \begin{pmatrix} x_s(k) + (R+\frac{d}{2})(sin(\theta+ \beta)-sin(\theta)) \\ y_s(k) + (R+{{d}\over{2}})(-cos(\theta+ \beta)+cos(\theta)) \\ \theta_s(k) + \beta\end{pmatrix}
-\label{eq:MotionModel}
-\end{align}
+\end{minipage}
+
+With the help of $d$, the distance between the robot's driven wheels, and the defined parameters $R$ and $\beta$ in \eqref{eq:beta} respectively \eqref{eq:R}, it is possible to formulate the motion model function in equation \eqref{eq:f_def}.
+\begin{equation}
+f = \begin{pmatrix} \hat{x}_s(k) + (R+\frac{d}{2})(sin(\hat{\theta}_s+ \beta)-sin(\hat{\theta}_s)) \\ \hat{y}_s(k) + (R+{\frac{d}{2}})(-cos(\hat{\theta}_s+ \beta)+cos(\hat{\theta}_s)) \\ \hat{\theta}_s(k) + \beta\end{pmatrix}
+\label{eq:f_def}
+\end{equation}
+
+For calculation the predicted state covariance $\Sigma_{X}(k+1|k)$ with equation \eqref{eq:cov_predict_def} the Jacobian $F$ of the motion model function is needed. It can be calculated by derivating $f$ with respect to the state $X$.
+\begin{equation}\label{eq:MotionModel}
+    \resizebox{0.91\hsize}{!}{%
+        $F = \frac{\partial f}{\partial X} = \begin{pmatrix} 1 & 0 & (R+{\frac{d}{2}})(cos(\hat{\theta}_s+ \beta)-cos(\hat{\theta}_s)) \\ 0 & 1 & (R+\frac{d}{2})(sin(\hat{\theta}_s+ \beta)-sin(\hat{\theta}_s)) \\ 0 & 0 & 1\end{pmatrix}$%      
+        }
+\end{equation}
+
+The Pioneer 3DX robot is able to determine its odometry off the shelf. By using backward differences the next state can also be predicted. With this solution approach the equations for the motion model function $f$ and its Jacobian $F$ can be simplified. 
+
+\begin{equation}
+f = \begin{pmatrix} \hat{x}_s(k) + \Delta x_{odom}(k) \\ \hat{y}_s(k) + \Delta y_{odom}(k) \\ \hat{\theta}_s(k) + \Delta \theta_{odom}(k)\end{pmatrix}
+\label{eq:f_simple}
+\end{equation}
+\begin{equation}
+F = \begin{pmatrix} 1 & 0 & - \Delta y_{odom}(k) \\ 0 & 1 & \Delta x_{odom}(k) \\ 0 & 0 & 1\end{pmatrix}
+\label{eq:f_simple}
+\end{equation}
+\begin{equation}
+Q = \begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1\end{pmatrix} \cdot \begin{pmatrix} q_{x,stat} + q_{x,dyn} |\Delta x_{odom}(k)| \\ q_{y,stat} + q_{y,dyn} |\Delta y_{odom}(k)|  \\ q_{\theta,stat} + q_{\theta,dyn} |\Delta \theta_{odom}(k)| \end{pmatrix}
+\label{eq:Q_dynamic}
+\end{equation}
 
 \subsubsection{Observation Prediction}
 \label{subsubsec:subsubsection_Tag}
@@ -80,7 +114,16 @@ Maybe add the anti-kidnapping stuff to the scheme picture.
 
 \subsection{Update}
 \label{subsec:Update}
-Subsection text here.
+
+
+\begin{align}
+& H = \begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1\end{pmatrix} \\
+& V(k+1)=Z(k+1)-\hat{Z}(k+1)=\begin{pmatrix} \Delta x_{v} & \Delta y_{v} & \Delta \theta_{v} \end{pmatrix}^T \label{eq:v_def}\\
+& \hat{X}(k+1|k+1) = \hat{X}(k+1|k) + K(k+1)V(k+1) \label{eq:state_update_def} \\
+& \Sigma_{X}(k+1|k+1) = (I-K(k+1)\cdot H)\cdot\Sigma_{X}(k+1|k) \label{eq:cov_update_def} \\
+& K(k+1)= \frac{\Sigma_{X}(k+1|k)}{\Sigma_{X}(k+1|k) + R(k+1)} \\
+& R= \begin{pmatrix} 0.01 & 0 & 0 \\ 0 & 0.01 & 0 \\ 0 & 0 & 0.01\end{pmatrix}
+\end{align}
 
 %\subsubsection{Subsubsection Heading Here}
 %\label{subsubsec:subsubsection_Tag}
