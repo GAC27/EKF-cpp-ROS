@@ -444,7 +444,7 @@ void ekf_step(ros::Time time_step){
 		pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ>  icpAligned= icp_matching(predictedPCLCloud,realPCLCloud);
 		boost::shared_ptr<pcl::Correspondences> correspondences (new pcl::Correspondences);
 		pcl::registration::CorrespondenceEstimation<pcl::PointXYZ, pcl::PointXYZ> corr_est;
-		corr_est.setInputCloud (predictedPCLCloud);
+		corr_est.setInputSource (predictedPCLCloud);
 		corr_est.setInputTarget (realPCLCloud);
 		corr_est.determineCorrespondences (*correspondences);
 		if(icpAligned.hasConverged() && correspondences->size() >= 600){		//Match
@@ -598,15 +598,14 @@ void scan_receiver(const sensor_msgs::LaserScan::ConstPtr& msg){
 
 int main(int argc, char **argv)
 {
-
 	ros::init(argc, argv, "ekf");   
 
 	ros::NodeHandle n;
 
 	listener= new tf::TransformListener();
-
-	ros::Subscriber sub_odom = n.subscribe("odom", 1000, odom_receiver);
-	ros::Subscriber sub_scan = n.subscribe("base_scan", 1000, scan_receiver);
+	
+	ros::Subscriber sub_odom = n.subscribe("RosAria/pose", 1000, odom_receiver);
+	ros::Subscriber sub_scan = n.subscribe("scan", 1000, scan_receiver);
 	ros::Subscriber sub_map = n.subscribe("/map_from_map_server", 1000, map_receiver);    //Has to subscribe to our moded_map_server topic in order to avoid rewriting the map
 
 	ros::Publisher pub_new_estimates = n.advertise<nav_msgs::Odometry>("EKF_New_State", 1000);
@@ -615,11 +614,12 @@ int main(int argc, char **argv)
 	real_point_cloud_publisher_ = n.advertise<sensor_msgs::PointCloud2> ("base_scan_cloud", 100, false);
 	location_undertainty = n.advertise<visualization_msgs::Marker>("/location_undertainty",1);
 	ros::Rate loop_rate(10);   
-
+	
 	while (ros::ok())
 	{
 
 		if(Map_Active){
+			
 		  ekf_step(ros::Time::now());
 		  
 		  transmit_state(prev_state, pub_new_estimates);

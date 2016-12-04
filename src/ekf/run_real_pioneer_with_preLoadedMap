@@ -13,27 +13,13 @@ sudo chmod 777 /dev/ttyUSB0
 rosrun rosaria RosAria &
 pid="$pid $!"
 
-sleep 1s
+sleep 5s
 
-echo "Launching transform Node"
-rosrun rosaria transform &
+echo "Launching Laser Scan Assembler"
+roslaunch pioneer_ros laser_scan_assembler &
 pid="$pid $!"
 
 sleep 1s
-
-echo "Launching Urg Node"
-sudo chmod 777 /dev/ttyACM0
-rosrun urg_node urg_node &
-pid="$pid $!"
-
-
-sleep 1s
-
-echo "Launching transform publishers..."
-roslaunch pioneer_ros pioneer_ros.launch &
-pid="$pid $!"
-
-sleep 3s
 
 echo "Launching navigation stack..."
 roslaunch nav_bundle nav_bundle.launch &
@@ -48,7 +34,7 @@ pid="$pid $!"
 sleep 4s
 
 echo "Launching Map"
-rosrun moded_map_server moded_map_server gazebo5FloorMap.yaml &
+rosrun moded_map_server moded_map_server AlmostPerfectMap.yaml &
 pid="$pid $!"
 
 sleep 3s
@@ -57,13 +43,12 @@ echo "Launching Rviz..."
 roslaunch pioneer_description pioneer_rviz.launch &
 pid="$pid $!"
 
+#sleep 1s
 
-sleep 1s
+#echo "Launching estop..."
+#rqt --standalone rqt_estop
 
-echo "Launching Teleop"
-rosrun teleop_keyobard_twist_keyboard_rosaria teleop_keyobard_twist_keyboard.py &
-pid="$pid $!"
-
+#sleep 1s
 
 trap "echo Killing all processes.; kill -2 TERM $pid; exit" SIGINT SIGTERM
 
