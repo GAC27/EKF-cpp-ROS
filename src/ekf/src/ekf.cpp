@@ -126,6 +126,8 @@ State* prev_state = NULL;
 State* new_state = NULL;
 
 bool Map_Active=false;
+bool Odom_Active=false;
+bool Scan_Active=false;
 
 MatrixXd realZ;
 
@@ -492,10 +494,11 @@ MatrixXd occupancyGridToMatrix(){
 
 void odom_receiver(const nav_msgs::Odometry::ConstPtr& msg)
 {
-  float x = msg->pose.pose.position.x;
-  float y = msg->pose.pose.position.y;
-  double theta = get_theta(msg->pose.pose.orientation);
-  current_odom = new State(x,y,theta);
+	float x = msg->pose.pose.position.x;
+	float y = msg->pose.pose.position.y;
+	double theta = get_theta(msg->pose.pose.orientation);
+	current_odom = new State(x,y,theta);
+  	Odom_Active=true;
 }
 
 void map_receiver(const nav_msgs::OccupancyGrid::ConstPtr& msg){
@@ -594,6 +597,7 @@ void bla(){
 void scan_receiver(const sensor_msgs::LaserScan::ConstPtr& msg){
 	scan=msg;
 	bla();
+	Scan_Active=true;
 }
 
 int main(int argc, char **argv)
@@ -618,7 +622,7 @@ int main(int argc, char **argv)
 	while (ros::ok())
 	{
 
-		if(Map_Active){
+		if(Map_Active && Scan_Active && Odom_Active){
 			
 		  ekf_step(ros::Time::now());
 		  

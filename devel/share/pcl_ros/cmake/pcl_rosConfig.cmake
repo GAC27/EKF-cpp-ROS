@@ -67,14 +67,14 @@ set(pcl_ros_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("TRUE" STREQUAL "TRUE")
-  set(pcl_ros_SOURCE_PREFIX /home/tiago/GitHub/SistemasAutonomos/src/perception_pcl/pcl_ros)
-  set(pcl_ros_DEVEL_PREFIX /home/tiago/GitHub/SistemasAutonomos/devel)
+  set(pcl_ros_SOURCE_PREFIX /home/gac/gazebo2-pioneer/src/perception_pcl/pcl_ros)
+  set(pcl_ros_DEVEL_PREFIX /home/gac/gazebo2-pioneer/devel)
   set(pcl_ros_INSTALL_PREFIX "")
   set(pcl_ros_PREFIX ${pcl_ros_DEVEL_PREFIX})
 else()
   set(pcl_ros_SOURCE_PREFIX "")
   set(pcl_ros_DEVEL_PREFIX "")
-  set(pcl_ros_INSTALL_PREFIX /home/tiago/GitHub/SistemasAutonomos/install)
+  set(pcl_ros_INSTALL_PREFIX /home/gac/gazebo2-pioneer/install)
   set(pcl_ros_PREFIX ${pcl_ros_INSTALL_PREFIX})
 endif()
 
@@ -91,9 +91,9 @@ endif()
 # flag project as catkin-based to distinguish if a find_package()-ed project is a catkin project
 set(pcl_ros_FOUND_CATKIN_PROJECT TRUE)
 
-if(NOT "/home/tiago/GitHub/SistemasAutonomos/devel/include;/home/tiago/GitHub/SistemasAutonomos/src/perception_pcl/pcl_ros/include;/usr/include;/usr/include/pcl-1.7;/usr/include/eigen3;/usr/include/ni;/usr/include/vtk-6.2;/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent;/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include;/usr/lib/openmpi/include;/usr/lib/openmpi/include/openmpi;/usr/include/hdf5/openmpi;/usr/include/jsoncpp;/usr/include/x86_64-linux-gnu;/usr/include/freetype2;/usr/include/x86_64-linux-gnu/freetype2;/usr/include/python2.7;/usr/include/libxml2;/usr/include/tcl " STREQUAL " ")
+if(NOT "/home/gac/gazebo2-pioneer/devel/include;/home/gac/gazebo2-pioneer/src/perception_pcl/pcl_ros/include;/usr/include;/usr/include/pcl-1.7;/usr/include/eigen3;/usr/include/ni;/usr/include/vtk-6.2;/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent;/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include;/usr/lib/openmpi/include;/usr/lib/openmpi/include/openmpi;/usr/include/hdf5/openmpi;/usr/include/x86_64-linux-gnu;/usr/include/freetype2;/usr/include/x86_64-linux-gnu/freetype2;/usr/include/jsoncpp;/usr/include/python2.7;/usr/include/libxml2;/usr/include/tcl " STREQUAL " ")
   set(pcl_ros_INCLUDE_DIRS "")
-  set(_include_dirs "/home/tiago/GitHub/SistemasAutonomos/devel/include;/home/tiago/GitHub/SistemasAutonomos/src/perception_pcl/pcl_ros/include;/usr/include;/usr/include/pcl-1.7;/usr/include/eigen3;/usr/include/ni;/usr/include/vtk-6.2;/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent;/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include;/usr/lib/openmpi/include;/usr/lib/openmpi/include/openmpi;/usr/include/hdf5/openmpi;/usr/include/jsoncpp;/usr/include/x86_64-linux-gnu;/usr/include/freetype2;/usr/include/x86_64-linux-gnu/freetype2;/usr/include/python2.7;/usr/include/libxml2;/usr/include/tcl")
+  set(_include_dirs "/home/gac/gazebo2-pioneer/devel/include;/home/gac/gazebo2-pioneer/src/perception_pcl/pcl_ros/include;/usr/include;/usr/include/pcl-1.7;/usr/include/eigen3;/usr/include/ni;/usr/include/vtk-6.2;/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent;/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include;/usr/lib/openmpi/include;/usr/lib/openmpi/include/openmpi;/usr/include/hdf5/openmpi;/usr/include/x86_64-linux-gnu;/usr/include/freetype2;/usr/include/x86_64-linux-gnu/freetype2;/usr/include/jsoncpp;/usr/include/python2.7;/usr/include/libxml2;/usr/include/tcl")
   foreach(idir ${_include_dirs})
     if(IS_ABSOLUTE ${idir} AND IS_DIRECTORY ${idir})
       set(include ${idir})
@@ -103,7 +103,7 @@ if(NOT "/home/tiago/GitHub/SistemasAutonomos/devel/include;/home/tiago/GitHub/Si
         message(FATAL_ERROR "Project 'pcl_ros' specifies '${idir}' as an include dir, which is not found.  It does not exist in '${include}'.  Ask the maintainer 'Paul Bovbel <paul@bovbel.com>, Bill Morris <bill@neautomation.com>' to fix it.")
       endif()
     else()
-      message(FATAL_ERROR "Project 'pcl_ros' specifies '${idir}' as an include dir, which is not found.  It does neither exist as an absolute directory nor in '/home/tiago/GitHub/SistemasAutonomos/src/perception_pcl/pcl_ros/${idir}'.  Ask the maintainer 'Paul Bovbel <paul@bovbel.com>, Bill Morris <bill@neautomation.com>' to fix it.")
+      message(FATAL_ERROR "Project 'pcl_ros' specifies '${idir}' as an include dir, which is not found.  It does neither exist as an absolute directory nor in '/home/gac/gazebo2-pioneer/src/perception_pcl/pcl_ros/${idir}'.  Ask the maintainer 'Paul Bovbel <paul@bovbel.com>, Bill Morris <bill@neautomation.com>' to fix it.")
     endif()
     _list_append_unique(pcl_ros_INCLUDE_DIRS ${include})
   endforeach()
@@ -122,7 +122,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/tiago/GitHub/SistemasAutonomos/devel/lib;/home/tiago/catkin_ws/devel/lib;/opt/ros/kinetic/lib)
+    foreach(path /home/gac/gazebo2-pioneer/devel/lib;/home/gac/gazebo2-pioneer/devel/lib;/opt/ros/kinetic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
