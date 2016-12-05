@@ -1,7 +1,7 @@
 <launch>
   <!-- SLAM mapping nodes -->
   <node pkg="gmapping" type="slam_gmapping" name="gmapping">
-		  <remap from="scan" to="base_scan"/> 
+		  <remap from="scan" to="scan"/> 
       <rosparam>
         xmin: 0
         ymin: 0

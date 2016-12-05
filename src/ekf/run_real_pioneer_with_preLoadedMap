@@ -15,26 +15,27 @@ pid="$pid $!"
 
 sleep 5s
 
-echo "Launching Laser Scan Assembler"
-roslaunch pioneer_ros laser_scan_assembler &
+echo "Launching Rosaria transform"
+rosrun rosaria transform &
 pid="$pid $!"
 
 sleep 1s
 
-echo "Launching navigation stack..."
-roslaunch nav_bundle nav_bundle.launch &
+echo "Launching Urg Node"
+sudo chmod 777 /dev/ttyACM0
+rosrun urg_node urg_node &
 pid="$pid $!"
 
-sleep 3s
+sleep 3sv
 
-echo "Launching controller..."
-roslaunch pioneer_ros pioneer_controller.launch &
+echo "Launching Gmapping..."
+rosrun gmapping slam_gmapping &
 pid="$pid $!"
 
 sleep 4s
 
 echo "Launching Map"
-rosrun moded_map_server moded_map_server AlmostPerfectMap.yaml &
+rosrun moded_map_server moded_map_server elevadores.yaml &
 pid="$pid $!"
 
 sleep 3s

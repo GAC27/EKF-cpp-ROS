@@ -108,6 +108,9 @@ laser_geometry::LaserProjection projector;
 tf::TransformListener* listener;
 pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ>  icp_matching(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_in, pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_out);
 
+int x_covariance;
+int y_covariance;
+
 
 //~ DEBUG
 pcl::PointCloud<pcl::PointXYZ>::Ptr ConvertFromPointCloud2ToPCL(sensor_msgs::PointCloud2 msg) {
@@ -158,8 +161,10 @@ void drawCovariance(const Eigen::Matrix2f& covMatrix)
     double lengthMajor = sqrt(eigValues[0]);
     double lengthMinor = sqrt(eigValues[1]);
 
-    tempMarker.scale.x = 3.0*lengthMajor;
-    tempMarker.scale.y = 3.0*lengthMinor;
+    tempMarker.scale.x = 2.4477*lengthMajor;
+    x_covariance = tempMarker.scale.x;
+    tempMarker.scale.y = 2.4477*lengthMinor;
+    y_covariance = tempMarker.scale.y;
     tempMarker.scale.z = 0.001;
 
     tempMarker.color.a = 1.0;
@@ -358,14 +363,23 @@ void prediction(ros::Time time_step){
 
 
 State* update(State* new_state, MatrixXd kalman_Gain, MatrixXd V_matrix, MatrixXd SKplusOne){
-
+	
 	MatrixXd _update = new_state->stateToMatrix() + kalman_Gain * V_matrix;
+	
+	
+	//if( std::abs(_update(0,0) - new_state->x) < x_covariance && std::abs(_update(1,0) - new_state->y) < y_covariance){
+		Covariance_K = UpdateCovariance(Covariance_KplusOne, kalman_Gain, SKplusOne);
 
-	Covariance_K = UpdateCovariance(Covariance_KplusOne, kalman_Gain, SKplusOne);
+		State* updatedState= new State(_update);
 
-	State* updatedState= new State(_update);
-
-	return updatedState;
+		return updatedState;
+	/*}
+	else
+	{
+		Covariance_K=Covariance_KplusOne;
+		return pre_state;
+	}*/
+	
 }
 
 
@@ -373,9 +387,9 @@ State* update(State* new_state, MatrixXd kalman_Gain, MatrixXd V_matrix, MatrixX
 //Kalman Gain
 MatrixXd KkplusOne(MatrixXd CovarianceKplusOne,MatrixXd H, MatrixXd S_KplusOne){
 	MatrixXd Rk(3,3);
-	Rk << 0.008, 0, 0,
-		    0, 0.008, 0,
-		    0, 0, 0.008;
+	Rk << 0.1, 0, 0,
+		    0, 0.1, 0,
+		    0, 0, 0.1;
 	
 	return CovarianceKplusOne * (CovarianceKplusOne + Rk).inverse();
 }
@@ -386,9 +400,9 @@ MatrixXd S_KplusOne(MatrixXd H, MatrixXd CovarianceKplusOne ){
 	MatrixXd _S_KplusOne;
 
 	MatrixXd Rk(3,3);
-	Rk << 0.01, 0, 0,
-		    0, 0.01, 0,
-		    0, 0, 0.01;
+	Rk << 0.1, 0, 0,
+		    0, 0.1, 0,
+		    0, 0, 0.1;
 
 	_S_KplusOne = H * CovarianceKplusOne * H.transpose() + Rk;
 
@@ -420,6 +434,7 @@ std::vector<int> matching(std::vector<MatrixXd> S_KplusOne, MatrixXd _V){
 
 void ekf_step(ros::Time time_step){
 	//init in first step
+	std::cout << "Start Ekf Step" << std::endl;
 	if(counter_steps == 0)
 	{
 		float x = current_odom->x;
@@ -427,12 +442,13 @@ void ekf_step(ros::Time time_step){
 		float theta = current_odom->theta;
 		prev_state = new State(x,y,theta, time_step);
 		prev_odom = new State(x,y,theta,time_step);
-		Covariance_K << 0.002, 0, 0,
-						0, 0.002, 0,
-						0, 0, 0.002;
+		Covariance_K << 0.06, 0, 0,
+						0, 0.06, 0,
+						0, 0, 0.06;
 	}
 	else
 	{
+		std::cout << "Second start Ekf Step" << std::endl;
 		//Prediction Step
 		prediction(time_step);
 
@@ -447,7 +463,7 @@ void ekf_step(ros::Time time_step){
 		corr_est.setInputSource (predictedPCLCloud);
 		corr_est.setInputTarget (realPCLCloud);
 		corr_est.determineCorrespondences (*correspondences);
-		if(icpAligned.hasConverged() && correspondences->size() >= 600){		//Match
+		if(icpAligned.hasConverged() && correspondences->size() >= 400){		//Match
 			MatrixXd _V = V(icpAligned); 
 			std::cout << "V: " << _V << std::endl;
 			//Update Step
@@ -512,7 +528,7 @@ pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp_matching(pcl::Point
 	pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;
 	icp.setInputSource(cloud_in);	//Predicted Observation
 	icp.setInputTarget(cloud_out); 	//Real Observation
-	icp.setMaxCorrespondenceDistance(0.001);//
+	icp.setMaxCorrespondenceDistance(0.01);//
 	icp.setMaximumIterations(700); // First Criteria
 	icp.setTransformationEpsilon(1e-7); //Second Criteria
 	//icp.setEuclideanFitnessEpsilon(0.0001); // Third Criteria
