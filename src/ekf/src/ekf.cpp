@@ -534,12 +534,12 @@ pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp_matching(pcl::Point
 	pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;
 	icp.setInputSource(cloud_in);	//Predicted Observation
 	icp.setInputTarget(cloud_out); 	//Real Observation
-	icp.setMaxCorrespondenceDistance(0.01);//
+	icp.setMaxCorrespondenceDistance(0.005);//
 	icp.setMaximumIterations(700); // First Criteria
 	icp.setTransformationEpsilon(1e-7); //Second Criteria
 	//icp.setEuclideanFitnessEpsilon(0.0001); // Third Criteria
-	icp.setRANSACIterations (1000);
-	icp.setRANSACOutlierRejectionThreshold(0.1);
+	//icp.setRANSACIterations (1000);
+	//icp.setRANSACOutlierRejectionThreshold(0.1);
 	
 	
 	pcl::PointCloud<pcl::PointXYZ> Final;
