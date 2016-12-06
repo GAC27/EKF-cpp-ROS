@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2016.7.7)  4 DEC 2016 17:49
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2016.7.7)  6 DEC 2016 21:59
 entering extended mode
 **./Report.tex
 (Report.tex
@@ -915,14 +915,7 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 82.
 )
 \Hy@SectionHShift=\skip49
-) (Report.aux
-
-LaTeX Warning: Label `eq:f_simple' multiply defined.
-
-
-LaTeX Warning: Label `subsubsec:subsubsection_Tag' multiply defined.
-
-)
+) (Report.aux)
 \openout1 = `Report.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 371.
@@ -1004,13 +997,42 @@ Missing character: There is no ™ in font ptmr7t!
 
 ])
 (chapters/3_Implementation.tex
-<figures/scheme.png, id=90, 910.15031pt x 512.66531pt>
+<figures/scheme.png, id=90, 960.58875pt x 529.98pt>
 File: figures/scheme.png Graphic file (type png)
-
-<use figures/scheme.png>
+ <use figures/scheme.png>
 Package pdftex.def Info: figures/scheme.png used on input line 12.
-(pdftex.def)             Requested size: 232.19843pt x 130.78659pt.
- [2 <./figures/scheme.png>]) (chapters/4_Results.tex)
+(pdftex.def)             Requested size: 232.19843pt x 128.10352pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 24--50
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 24--50
+
+ []
+
+[2 <./figures/scheme.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 102--103
+
+ []
+
+<figures/raycast.pdf, id=128, 305.88448pt x 322.61205pt>
+File: figures/raycast.pdf Graphic file (type pdf)
+
+<use figures/raycast.pdf>
+Package pdftex.def Info: figures/raycast.pdf used on input line 113.
+(pdftex.def)             Requested size: 154.80157pt x 163.26976pt.
+ <figures/M.png, id=129, 1175.89313pt x 516.42938pt>
+File: figures/M.png Graphic file (type png)
+
+<use figures/M.png>
+Package pdftex.def Info: figures/M.png used on input line 121.
+(pdftex.def)             Requested size: 180.60315pt x 79.31287pt.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [3 <./figures/raycast.pdf> <./figures/M.png>]) (chapters/4_Results.tex)
 (chapters/5_Conclusion.tex
 Missing character: There is no Ã in font ptmr7t!
 Missing character: There is no © in font ptmr7t!
@@ -1029,25 +1051,24 @@ Missing character: There is no ­ in font ptmr7t!
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
 Missing character: There is no “ in font ptmr7t!
-) [3]
+)
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 583.
+ [4
+
+]
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 583.
  (Report.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 583.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 583.
 Package rerunfilecheck Info: File `Report.out' has not changed.
-(rerunfilecheck)             Checksum: DE5E708014F835194FAE360E2B70201E;936.
-
-
-LaTeX Warning: There were multiply-defined labels.
-
+(rerunfilecheck)             Checksum: E06D07B2B644063D4C34459918BC24EF;936.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 583.
  ) 
 Here is how much of TeX's memory you used:
- 27402 strings out of 493634
- 658671 string characters out of 8884832
+ 27418 strings out of 493634
+ 658967 string characters out of 8884832
  9789335 words of memory out of 99000000
- 30265 multiletter control sequences out of 15000+200000
+ 30277 multiletter control sequences out of 15000+200000
  43243 words of font info for 88 fonts, out of 90000 for 9000
  1028 hyphenation exceptions out of 8191
  62i,17n,84p,895b,609s stack positions out of 5000i,500n,10000p,900000b,50000s
@@ -1069,9 +1090,9 @@ ata/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Users/Markus
 Markus/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/U
 sers/Markus/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmri8a.pfb
 >
-Output written on Report.pdf (3 pages, 224900 bytes).
+Output written on Report.pdf (4 pages, 370097 bytes).
 PDF statistics:
- 201 PDF objects out of 1000 (max. 8388607)
- 46 named destinations out of 1000 (max. 500000)
- 146 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 216 PDF objects out of 1000 (max. 8388607)
+ 48 named destinations out of 1000 (max. 500000)
+ 156 words of extra memory for PDF output out of 10000 (max. 10000000)
 
