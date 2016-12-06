@@ -8,11 +8,11 @@ roscore &
 pid=$!
 sleep 5s
 
-#echo "Launching Gazebo..."
-#roslaunch pioneer_gazebo pioneer_world.launch &
-#pid="$pid $!"
+echo "Launching Gazebo..."
+roslaunch pioneer_gazebo pioneer_world.launch &
+pid="$pid $!"
 
-#sleep 5s
+sleep 5s
 
 #echo "Launching transform publishers..."
 #roslaunch pioneer_ros pioneer_ros.launch &
