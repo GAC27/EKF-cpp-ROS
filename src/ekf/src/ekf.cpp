@@ -200,7 +200,7 @@ State* f(State* prevState,State* odomState, State* currentOdom, ros::Time time_n
 MatrixXd F(State prev_state, State new_state){
   MatrixXd m(3,3);
   m << 1, 0, -(new_state.y-prev_state.y),
-	   0, 1, -(new_state.x-prev_state.x),
+	   0, 1, (new_state.x-prev_state.x),
 	   0, 0, 1;
   return m;
 }
@@ -392,9 +392,9 @@ State* update(State* new_state, MatrixXd kalman_Gain, MatrixXd V_matrix, MatrixX
 //Kalman Gain
 MatrixXd KkplusOne(MatrixXd CovarianceKplusOne,MatrixXd H, MatrixXd S_KplusOne){
 	MatrixXd Rk(3,3);
-	Rk << 0.008, 0, 0,
-		    0, 0.008, 0,
-		    0, 0, 0.008;
+	Rk << 0.1, 0, 0,
+		  0, 0.1, 0,
+	      0, 0, 0.1;
 	
 	return CovarianceKplusOne * (CovarianceKplusOne + Rk).inverse();
 }
@@ -534,7 +534,7 @@ pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp_matching(pcl::Point
 	pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;
 	icp.setInputSource(cloud_in);	//Predicted Observation
 	icp.setInputTarget(cloud_out); 	//Real Observation
-	icp.setMaxCorrespondenceDistance(0.001);//
+	icp.setMaxCorrespondenceDistance(0.01);//
 	icp.setMaximumIterations(700); // First Criteria
 	icp.setTransformationEpsilon(1e-7); //Second Criteria
 	//icp.setEuclideanFitnessEpsilon(0.0001); // Third Criteria
@@ -627,8 +627,8 @@ int main(int argc, char **argv)
 
 	listener= new tf::TransformListener();
 	
-	ros::Subscriber sub_odom = n.subscribe("odom", 1000, odom_receiver);
-	ros::Subscriber sub_scan = n.subscribe("base_scan", 1000, scan_receiver);
+	ros::Subscriber sub_odom = n.subscribe("RosAria/pose", 1000, odom_receiver);
+	ros::Subscriber sub_scan = n.subscribe("scan", 1000, scan_receiver);
 	ros::Subscriber sub_map = n.subscribe("/map_from_map_server", 1000, map_receiver);    //Has to subscribe to our moded_map_server topic in order to avoid rewriting the map
 
 	ros::Publisher pub_new_estimates = n.advertise<nav_msgs::Odometry>("EKF_New_State", 1000);
