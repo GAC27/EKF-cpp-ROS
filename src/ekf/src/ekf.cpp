@@ -33,6 +33,7 @@
 #include <pcl/registration/transformation_estimation_lm.h>
 #include <pcl/registration/transformation_estimation_svd.h>
 #include <pcl/features/normal_3d.h>
+#include <fstream>
 
 using namespace laser_assembler;
 using Eigen::MatrixXd;
@@ -439,7 +440,13 @@ std::vector<int> matching(std::vector<MatrixXd> S_KplusOne, MatrixXd _V){
 
 void ekf_step(ros::Time time_step){
 	//init in first step
+	std::ofstream statefile;
+	statefile.open ("states.txt", std::ios::app);
+	std::ofstream covariancefile;
+	covariancefile.open ("covariance.txt", std::ios::app);
 	std::cout << "Start Ekf Step" << std::endl;
+	std::ofstream odomfile;
+	odomfile.open ("odom.txt", std::ios::app);
 	if(counter_steps == 0)
 	{
 		float x = current_odom->x;
@@ -491,7 +498,12 @@ void ekf_step(ros::Time time_step){
 		std::cout<< "Cov(K+1|K)=\n" << Covariance_KplusOne << "\nCov(K+1|K+1)=\n" << Covariance_K << std::endl;
 		std::cout<< (correspondences->size()) << std::endl;
 		prev_odom=current_odom;
-		
+		statefile << new_state->x << "," << new_state->y << "," << new_state->theta << "\n" << std::endl;
+		covariancefile << Covariance_K  << "\n" << std::endl;
+		odomfile << current_odom->x << "," << current_odom->y << "," << current_odom->theta << "\n" << std::endl;
+		statefile.close();
+		covariancefile.close();
+		odomfile.close();
 	}
 }
 
@@ -534,9 +546,9 @@ pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp_matching(pcl::Point
 	pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;
 	icp.setInputSource(cloud_in);	//Predicted Observation
 	icp.setInputTarget(cloud_out); 	//Real Observation
-	icp.setMaxCorrespondenceDistance(0.005);//
+	icp.setMaxCorrespondenceDistance(0.002);//
 	icp.setMaximumIterations(700); // First Criteria
-	icp.setTransformationEpsilon(1e-7); //Second Criteria
+	icp.setTransformationEpsilon(5 * 1e-7); //Second Criteria
 	//icp.setEuclideanFitnessEpsilon(0.0001); // Third Criteria
 	//icp.setRANSACIterations (1000);
 	//icp.setRANSACOutlierRejectionThreshold(0.1);
