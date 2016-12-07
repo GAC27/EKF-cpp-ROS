@@ -393,9 +393,9 @@ State* update(State* new_state, MatrixXd kalman_Gain, MatrixXd V_matrix, MatrixX
 //Kalman Gain
 MatrixXd KkplusOne(MatrixXd CovarianceKplusOne,MatrixXd H, MatrixXd S_KplusOne){
 	MatrixXd Rk(3,3);
-	Rk << 0.1, 0, 0,
-		  0, 0.1, 0,
-	      0, 0, 0.1;
+	Rk << 5, 0, 0,
+		  0, 5, 0,
+	      0, 0, 5;
 	
 	return CovarianceKplusOne * (CovarianceKplusOne + Rk).inverse();
 }
@@ -449,11 +449,11 @@ void ekf_step(ros::Time time_step){
 	odomfile.open ("odom.txt", std::ios::app);
 	if(counter_steps == 0)
 	{
-		float x = current_odom->x;
-		float y = current_odom->y;
-		float theta = current_odom->theta;
+		float x = 0;
+		float y = 2;
+		float theta = 2.8;
 		prev_state = new State(x,y,theta, time_step);
-		prev_odom = new State(x,y,theta,time_step);
+		prev_odom = new State(current_odom->x,current_odom->y,current_odom->theta,time_step);
 		Covariance_K << 0.002, 0, 0,
 						0, 0.002, 0,
 						0, 0, 0.002;
@@ -476,6 +476,7 @@ void ekf_step(ros::Time time_step){
 		corr_est.setInputTarget (realPCLCloud);
 		corr_est.determineCorrespondences (*correspondences);
 		if(icpAligned.hasConverged() && correspondences->size() >= 400){		//Match
+			counter_steps = 1;
 			MatrixXd _V = V(icpAligned); 
 			std::cout << "V: " << _V << std::endl;
 			//Update Step
@@ -486,6 +487,12 @@ void ekf_step(ros::Time time_step){
 			prev_state=new_state;
 			Covariance_K=Covariance_KplusOne;
 		}
+		
+		if(counter_steps >= 101)
+		{
+			Covariance_K= Covariance_K * 10;
+			counter_steps = 1;
+		}	
 		
 		Eigen::Matrix2f covMatrix;
 		covMatrix(0,0)=Covariance_K(1,1);
@@ -639,8 +646,14 @@ int main(int argc, char **argv)
 
 	listener= new tf::TransformListener();
 	
-	ros::Subscriber sub_odom = n.subscribe("RosAria/pose", 1000, odom_receiver);
-	ros::Subscriber sub_scan = n.subscribe("scan", 1000, scan_receiver);
+	counter_steps = 0;
+	
+	//GAZEBO
+	ros::Subscriber sub_odom = n.subscribe("odom", 1000, odom_receiver);
+	ros::Subscriber sub_scan = n.subscribe("base_scan", 1000, scan_receiver);
+	//ROS
+	/*ros::Subscriber sub_odom = n.subscribe("RosAria/pose", 1000, odom_receiver);
+	ros::Subscriber sub_scan = n.subscribe("scan", 1000, scan_receiver);*/
 	ros::Subscriber sub_map = n.subscribe("/map_from_map_server", 1000, map_receiver);    //Has to subscribe to our moded_map_server topic in order to avoid rewriting the map
 
 	ros::Publisher pub_new_estimates = n.advertise<nav_msgs::Odometry>("EKF_New_State", 1000);
@@ -654,6 +667,7 @@ int main(int argc, char **argv)
 	{
 
 		if(Map_Active && Scan_Active && Odom_Active){
+			
 			
 		  ekf_step(ros::Time::now());
 		  
