@@ -5,7 +5,7 @@
 % 3. Implementation (describe the details of what you did, possibly divided in sections, one per major subsystems, e.g., navigation, mapping, HRI, task coordination and integration/architectures)
 %%%%%%%%%%%%%%%%%%%%%%%
 
-This section describes how the EKF with it's three basic steps has been implemented for the faced robot localization problem with a LRF. In subsection \ref{subsec:Prediction} the motion model and the observation model are discussed. The subsections \ref{subsec:Matching} and \ref{subsec:Update} deal with the matching respectively the update step. The resulting scheme of the implementation is shown in figure \ref{fig:EKF_scheme}. 
+This section describes how the EKF with its three basic steps has been implemented for the faced robot localization problem with a LRF. In subsection \ref{subsec:Prediction} the motion model and the observation model are discussed. The subsections \ref{subsec:Matching} and \ref{subsec:Update} deal with the matching and the update step respectively. The resulting scheme of the implementation is shown in figure \ref{fig:EKF_scheme}. 
 
 \begin{figure}[h]
 \centering
@@ -14,7 +14,7 @@ This section describes how the EKF with it's three basic steps has been implemen
       \label{fig:EKF_scheme}
 \end{figure}
 
-The robot's state $X$ is defined as it's current two dimensional pose. The observation $Z$ used for the Extended Kalman filter, like explained in section \ref{subsec:Matching}, also includes variables to describe a pose. 
+The robot's state $X$ is defined as its current two dimensional pose. The observation $Z$ used for the Extended Kalman filter, like explained in section \ref{subsec:Matching}, also includes variables to describe a pose. 
 \begin{align}
 X&=\begin{pmatrix}x_s & y_s & \theta_s \end{pmatrix}^T \label{eq:state_def} \\
 Z&=\begin{pmatrix}x_{obs} & y_{obs} & \theta_{obs} \end{pmatrix}^T \label{eq:observation_def}\\
@@ -54,7 +54,7 @@ The motion and observation model need to be defined by the user depending on the
 \subsubsection{State Prediction}
 \label{subsubsec:State_Prediction}
 One of the main ideas of the EKF lies in linearising the motion and measurement model.
-For the state prediction, the motion model is decomposed a the noise-free part in  \eqref{eq:state_predict_def} and a random noise component with zero mean in equation \eqref{eq:cov_predict_def}.
+For the state prediction, the motion model is decomposed as the noise-free part in  \eqref{eq:state_predict_def} and a random noise component with zero mean in equation \eqref{eq:cov_predict_def}.
 \begin{align}
 \hat{X}(k+1|k) &= f(\hat{X}(k),~U(k)) \label{eq:state_predict_def} \\
 \Sigma_{X}(k+1|k) &= F \Sigma_{X}(k|k) F^{T} + Q(k) \label{eq:cov_predict_def} 
@@ -115,7 +115,7 @@ The idea of the algorithm is shown in figure \ref{fig:Raycasting}. The maximum a
       \label{fig:Raycasting}
 \end{figure}
 
-The iterative Closes Point algorithm (ICP) to minimize the distance between to clouds of points. One of the point clouds is the reference or target point cloud, which is kept fixed. The other one, the source point cloud, is transformed to best match the reference.
+The Iterative Closes Point algorithm (ICP) to minimize the distance between two clouds of points. One of the point clouds is the reference or target point cloud, which is kept fixed. The other one, the source point cloud, is transformed to best match the reference.
 \begin{figure}[h!]
 \centering
 \includegraphics[width=0.35\textwidth]{figures/M}
