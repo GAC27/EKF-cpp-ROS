@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2016.7.7)  6 DEC 2016 21:59
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2016.7.7)  8 DEC 2016 12:32
 entering extended mode
 **./Report.tex
 (Report.tex
@@ -918,20 +918,20 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 ) (Report.aux)
 \openout1 = `Report.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 371.
-LaTeX Font Info:    ... okay on input line 371.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 371.
-LaTeX Font Info:    ... okay on input line 371.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 371.
-LaTeX Font Info:    ... okay on input line 371.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 371.
-LaTeX Font Info:    ... okay on input line 371.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 371.
-LaTeX Font Info:    ... okay on input line 371.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 371.
-LaTeX Font Info:    ... okay on input line 371.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 371.
-LaTeX Font Info:    ... okay on input line 371.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 372.
+LaTeX Font Info:    ... okay on input line 372.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 372.
+LaTeX Font Info:    ... okay on input line 372.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 372.
+LaTeX Font Info:    ... okay on input line 372.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 372.
+LaTeX Font Info:    ... okay on input line 372.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 372.
+LaTeX Font Info:    ... okay on input line 372.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 372.
+LaTeX Font Info:    ... okay on input line 372.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 372.
+LaTeX Font Info:    ... okay on input line 372.
 
 -- Lines per column: 58 (exact).
 Package caption Info: Begin \AtBeginDocument code.
@@ -958,7 +958,7 @@ Package pgfplots notification 'compat/show suggested version=true': document ha
 s been generated with the most recent feature set (\pgfplotsset{compat=1.13}).
 
 \AtBeginShipoutBox=\box44
-Package hyperref Info: Link coloring ON on input line 371.
+Package hyperref Info: Link coloring ON on input line 372.
 
 ("C:\Users\Markus\AppData\Local\Programs\MiKTeX 2.9\tex\latex\hyperref\nameref.
 sty"
@@ -970,9 +970,9 @@ Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 )
 \c@section@level=\count157
 )
-LaTeX Info: Redefining \ref on input line 371.
-LaTeX Info: Redefining \pageref on input line 371.
-LaTeX Info: Redefining \nameref on input line 371.
+LaTeX Info: Redefining \ref on input line 372.
+LaTeX Info: Redefining \pageref on input line 372.
+LaTeX Info: Redefining \nameref on input line 372.
  (Report.out) (Report.out)
 \@outlinefile=\write4
 \openout4 = `Report.out'.
@@ -997,43 +997,68 @@ Missing character: There is no ô in font ptmr7t!
 
 ])
 (chapters/3_Implementation.tex
-<figures/scheme.png, id=90, 960.58875pt x 529.98pt>
+<figures/scheme.png, id=98, 960.58875pt x 529.98pt>
 File: figures/scheme.png Graphic file (type png)
  <use figures/scheme.png>
 Package pdftex.def Info: figures/scheme.png used on input line 12.
 (pdftex.def)             Requested size: 232.19843pt x 128.10352pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 24--50
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 24--50
-
- []
-
 [2 <./figures/scheme.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 102--103
-
- []
-
-<figures/raycast.pdf, id=128, 305.88448pt x 322.61205pt>
+<figures/raycast.pdf, id=136, 305.88448pt x 322.61205pt>
 File: figures/raycast.pdf Graphic file (type pdf)
 
 <use figures/raycast.pdf>
 Package pdftex.def Info: figures/raycast.pdf used on input line 113.
 (pdftex.def)             Requested size: 154.80157pt x 163.26976pt.
- <figures/M.png, id=129, 1175.89313pt x 516.42938pt>
-File: figures/M.png Graphic file (type png)
 
-<use figures/M.png>
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+<figures/M.png, id=137, 1175.89313pt x 516.42938pt>
+File: figures/M.png Graphic file (type png)
+ <use figures/M.png>
 Package pdftex.def Info: figures/M.png used on input line 121.
 (pdftex.def)             Requested size: 180.60315pt x 79.31287pt.
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+[3 <./figures/raycast.pdf> <./figures/M.png>]) (chapters/4_Results.tex
 
- [3 <./figures/raycast.pdf> <./figures/M.png>]) (chapters/4_Results.tex)
-(chapters/5_Conclusion.tex
+LaTeX Warning: Reference `fig:ekf_odom' on page 4 undefined on input line 15.
+
+\figureheight=\skip50
+\figurewidth=\skip51
+(figures/ekf_odom.tikz
+Missing character: There is no ; in font nullfont!
+Missing character: There is no ; in font nullfont!
+Missing character: There is no ; in font nullfont!
+)
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+Missing character: There is no ‚ in font ptmr7t!
+Missing character: There is no Ä in font ptmr7t!
+Missing character: There is no ô in font ptmr7t!
+Missing character: There is no ‚ in font ptmr7t!
+Missing character: There is no Ä in font ptmr7t!
+Missing character: There is no ô in font ptmr7t!
+Missing character: There is no ‚ in font ptmr7t!
+Missing character: There is no Ä in font ptmr7t!
+Missing character: There is no ô in font ptmr7t!
+Missing character: There is no ‚ in font ptmr7t!
+Missing character: There is no Ä in font ptmr7t!
+Missing character: There is no ô in font ptmr7t!
+Missing character: There is no ‚ in font ptmr7t!
+Missing character: There is no Ä in font ptmr7t!
+Missing character: There is no ú in font ptmr7t!
+Missing character: There is no ‚ in font ptmr7t!
+Missing character: There is no Ä in font ptmr7t!
+Missing character: There is no ù in font ptmr7t!
+Missing character: There is no ‚ in font ptmr7t!
+Missing character: There is no Ä in font ptmr7t!
+Missing character: There is no ô in font ptmr7t!
+Missing character: There is no ‚ in font ptmr7t!
+Missing character: There is no Ä in font ptmr7t!
+Missing character: There is no ô in font ptmr7t!
+) (chapters/5_Conclusion.tex
 Missing character: There is no √ in font ptmr7t!
 Missing character: There is no © in font ptmr7t!
 Missing character: There is no √ in font ptmr7t!
@@ -1046,32 +1071,36 @@ Missing character: There is no Ä in font ptmr7t!
 Missing character: There is no ì in font ptmr7t!
 Missing character: There is no √ in font ptmr7t!
 Missing character: There is no ≠ in font ptmr7t!
-) (chapters/6_Appendices.tex)
+ [4]) (chapters/6_Appendices.tex)
 (chapters/7_Acknowledgment.tex) (chapters/8_References.tex
 Missing character: There is no ‚ in font ptmr7t!
 Missing character: There is no Ä in font ptmr7t!
 Missing character: There is no ì in font ptmr7t!
 )
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 583.
- [4
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 584.
+ [5
 
 ]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 583.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 584.
  (Report.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 583.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 583.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 584.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 584.
 Package rerunfilecheck Info: File `Report.out' has not changed.
-(rerunfilecheck)             Checksum: E06D07B2B644063D4C34459918BC24EF;936.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 583.
+(rerunfilecheck)             Checksum: DBE735B4A55BCC594CA3655D2BC7E9FD;1058.
+
+
+LaTeX Warning: There were undefined references.
+
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 584.
  ) 
 Here is how much of TeX's memory you used:
- 27418 strings out of 493634
- 658967 string characters out of 8884832
- 9789335 words of memory out of 99000000
- 30277 multiletter control sequences out of 15000+200000
- 43243 words of font info for 88 fonts, out of 90000 for 9000
+ 27936 strings out of 493634
+ 674165 string characters out of 8884832
+ 10992954 words of memory out of 99000000
+ 30786 multiletter control sequences out of 15000+200000
+ 44350 words of font info for 89 fonts, out of 90000 for 9000
  1028 hyphenation exceptions out of 8191
- 62i,17n,84p,895b,609s stack positions out of 5000i,500n,10000p,900000b,50000s
+ 62i,20n,84p,1053b,2158s stack positions out of 5000i,500n,10000p,900000b,50000s
 {C:/Users/Markus/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/fontname/8
 r.enc}<C:/Users/Markus/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/ams
 fonts/cm/cmex10.pfb><C:/Users/Markus/AppData/Local/Programs/MiKTeX 2.9/fonts/ty
@@ -1090,9 +1119,9 @@ ata/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Users/Markus
 Markus/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/U
 sers/Markus/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmri8a.pfb
 >
-Output written on Report.pdf (4 pages, 370097 bytes).
+Output written on Report.pdf (5 pages, 428622 bytes).
 PDF statistics:
- 216 PDF objects out of 1000 (max. 8388607)
- 48 named destinations out of 1000 (max. 500000)
- 156 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 234 PDF objects out of 1000 (max. 8388607)
+ 52 named destinations out of 1000 (max. 500000)
+ 172 words of extra memory for PDF output out of 10000 (max. 10000000)
 

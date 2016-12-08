@@ -5,13 +5,33 @@
 %4.Experimental Results (show the most relevant results to illustrate the merits and the possible unresoved issues)
 %%%%%%%%%%%%%%%%%%%%%%%
 
-The used results will be presented here. This sentence is only to fill one more line. "Make the text beautiful again".
+To test the implemented system, we did a setup of a pre-defined trajectory(INSERT PICTURE WITH TRAJECTORY IN REAL WORLD) with obstacles to make it possible to match the most observations as possible. The robot would run X laps during the simulation in order to accumulate odometry errors and therefore, get different position readings than the prediction made by our EKF. To perform the test, we defined the following system values as such:
+%ICP parameters:
+\begin{itemize}
+\item ICP Max correspondence distance = $0.002$;
+\item ICP Maximum Iterations = $700$;
+\item ICP Transformation Epsilon = $5 \cdot 10^-7$
+\end{itemize}
+The predicted positions of the odometry only and the EKF implementation are shown in figure \ref{fig:ekf_odom}.\begin{figure}[h]
+	\centering
+	\newlength\figureheight 
+	\newlength\figurewidth 
+	\setlength\figureheight{6cm} 
+	\setlength\figurewidth{7cm}
+	\input{figures/ekf_odom.tikz}
+      \caption{Comparison between odometry only and EKF implementation}	  
+      \label{fig:Auftriebspolare} 
+\end{figure}
 
-IST benefits from an IBM supercomputer built in 2007, which is one of the most powerful in Portugal (1.6 TFLOPS as of 2007).[3]
 
-%\subsection{Subsection Heading Here}
-%\label{subsec:subsection_Tag}
-%Subsection text here.
+\subsection{Discussion}
+\label{subsec:Discussion}
+Using the PCL’s ICP algorithm in some situations the algorithm would converge using either few points or with an observation that isn’t the same as the real one. Given this, our algorithm would sometimes match in positions that aren’t the real one. To improve this, it would be necessary to modify the ICP’s sensibility in order to avoid wrong matches.
+Furthermore, no scaling algorithm has been used. In situations where either the predicted or the real position is very close to an obstacle and the other one is far way from the distance, a scaling algorithm, that prepares the point clouds for the ICP algorithm, can heavily increase the ICP's performance.
+
+\subsection{Kidnapping}
+\label{subsec:Kidnapping}
+To create a robustness to kidnapping situations we implemented a special condition in the EKF algorithm. Whenever we have 100 consecutive mismatches we multiply the covariance size by 10 times. This gives us the possibility for the EKF to “search” it’s position in a bigger area making it possible to encounter its real position. But this creates also an extra problem. Although this can help us recover from kidnapping situations it could also make the prediction diverge from the real position. If the EKF matches a wrong position’s observation with our real observation, then it will decrease its covariance size and calculate its predicted position as being wrong. Recovering from this will be a challenge just like using the normal EKF behavior. To try and correct this problem we have a varying threshold of ICP algorithm. When we increase the covariance we also turn the sensibility of the ICP up by decreasing the threshold. This way we can avoid to some degree mismatches in the EKF algorithm.
 
 %\subsubsection{Subsubsection Heading Here}
 %\label{subsubsec:subsubsection_Tag}
