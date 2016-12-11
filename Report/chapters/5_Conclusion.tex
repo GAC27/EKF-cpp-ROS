@@ -7,6 +7,8 @@
 
 The Extended Kalman Filter after being tested and analyzed thoroughly proved to be a good estimator. Although not perfect in terms of position estimation, due to the various problems described along this paper, the EKF achieved good results and could predict the real position of the robot better than the odometry. But in cases where there are many possible positions with very similar observations the EKF is at its worst. In cases where, for example, we have long hallways without any sort of landmarks the EKF, although able to match its predicted observations with the real observations is very prone to wrongly estimate its position. Having this in thought, we concluded that the Extended Kalman Filter is best suited to environments with many landmarks or that don't have a high number of positions with similar observations. 
 
+In terms of kidnapping robustness the EKF can be robust but only in situations where the kidnap doesn't move the robot very far away from its last predicted position. In cases where the latter occurs, the EKF may not be able to converge in contrast with particle based filters which use probabilistic distributions to estimate its position.
+
 %\subsection{Subsection Heading Here}
 %\label{subsec:subsection_Tag}
 %Subsection text here.
