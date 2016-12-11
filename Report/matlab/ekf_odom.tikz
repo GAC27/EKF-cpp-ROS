@@ -19,16 +19,16 @@ width=0.951\figurewidth,
 height=\figureheight,
 at={(0\figurewidth,0\figureheight)},
 scale only axis,
-xmin=-0.7,
-xmax=1.69324787799709,
+xmin=-2.64586238044088,
+xmax=3.69324787799709,
 xlabel={x - Coordinate},
 ymin=-4.73879507361122,
 ymax=0.260922533447115,
 ylabel={y - Coordinate},
 axis background/.style={fill=white},
-%title style={font=\bfseries},
-%title={Comaprison EKF vs. Odometry},
-legend style={at={(1.00,0.56)},anchor=north west,legend cell align=left,align=left,draw=white!15!black}
+title style={font=\bfseries},
+title={Comaprison EKF vs. Odometry},
+legend style={legend cell align=left,align=left,draw=white!15!black}
 ]
 \addplot [color=black,dashdotted,line width=1.5pt]
   table[row sep=crcr]{%
@@ -2101,7 +2101,7 @@ legend style={at={(1.00,0.56)},anchor=north west,legend cell align=left,align=le
 };
 \addlegendentry{Covariance};
 
-\addplot[only marks,mark=x,mark options={},mark size=1.5000pt,color=mycolor1] plot table[row sep=crcr]{%
+\addplot[only marks,mark=x,mark options={},mark size=1.5000pt,color=mycolor3] plot table[row sep=crcr]{%
 0.914693	0.0197139\\
 };
 \addplot [color=red,dotted,line width=1.5pt,forget plot]
@@ -2207,7 +2207,7 @@ legend style={at={(1.00,0.56)},anchor=north west,legend cell align=left,align=le
 1.06352495524606	-0.179343582903012\\
 1.06151723007463	-0.193964835679451\\
 };
-\addplot[only marks,mark=x,mark options={},mark size=1.5000pt,color=mycolor1] plot table[row sep=crcr]{%
+\addplot[only marks,mark=x,mark options={},mark size=1.5000pt,color=mycolor4] plot table[row sep=crcr]{%
 1.294	-0.218364\\
 };
 \addplot [color=red,dotted,line width=1.5pt,forget plot]
@@ -2313,7 +2313,7 @@ legend style={at={(1.00,0.56)},anchor=north west,legend cell align=left,align=le
 0.993038724492851	-2.12049853577269\\
 0.991787328266622	-2.13581814406055\\
 };
-\addplot[only marks,mark=x,mark options={},mark size=1.5000pt,color=mycolor1] plot table[row sep=crcr]{%
+\addplot[only marks,mark=x,mark options={},mark size=1.5000pt,color=mycolor5] plot table[row sep=crcr]{%
 1.258	-2.14823\\
 };
 \addplot [color=red,dotted,line width=1.5pt,forget plot]
@@ -2419,7 +2419,7 @@ legend style={at={(1.00,0.56)},anchor=north west,legend cell align=left,align=le
 0.74770667969349	-4.31889186292627\\
 0.745630085194669	-4.34262448114362\\
 };
-\addplot[only marks,mark=x,mark options={},mark size=1.5000pt,color=mycolor1] plot table[row sep=crcr]{%
+\addplot[only marks,mark=x,mark options={},mark size=1.5000pt,color=mycolor6] plot table[row sep=crcr]{%
 1.12062	-4.36347\\
 };
 \addplot [color=red,dotted,line width=1.5pt,forget plot]
@@ -2525,7 +2525,7 @@ legend style={at={(1.00,0.56)},anchor=north west,legend cell align=left,align=le
 0.146819879159536	-3.84329788022882\\
 0.122603093031605	-3.84000970142448\\
 };
-\addplot[only marks,mark=x,mark options={},mark size=1.5000pt,color=mycolor1] plot table[row sep=crcr]{%
+\addplot[only marks,mark=x,mark options={},mark size=1.5000pt,color=mycolor7] plot table[row sep=crcr]{%
 0.0789017	-4.28341\\
 };
 \addplot [color=red,dotted,line width=1.5pt,forget plot]
@@ -2737,7 +2737,7 @@ legend style={at={(1.00,0.56)},anchor=north west,legend cell align=left,align=le
 0.825878200310301	-1.51609190347656\\
 0.823959685051486	-1.53919732337052\\
 };
-\addplot[only marks,mark=x,mark options={},mark size=1.5000pt,color=mycolor1] plot table[row sep=crcr]{%
+\addplot[only marks,mark=x,mark options={},mark size=1.5000pt,color=mycolor2] plot table[row sep=crcr]{%
 1.203	-1.55812\\
 };
 \addplot [color=red,dotted,line width=1.5pt,forget plot]
@@ -2843,7 +2843,7 @@ legend style={at={(1.00,0.56)},anchor=north west,legend cell align=left,align=le
 -0.201536297280739	0.0399652680166712\\
 -0.201964765766038	0.0267258580462291\\
 };
-\addplot[only marks,mark=x,mark options={},mark size=1.5000pt,color=mycolor1] plot table[row sep=crcr]{%
+\addplot[only marks,mark=x,mark options={},mark size=1.5000pt,color=mycolor3] plot table[row sep=crcr]{%
 0.00955039	0.026684\\
 };
 \addplot [color=red,dotted,line width=1.5pt,forget plot]
@@ -2949,9 +2949,18 @@ legend style={at={(1.00,0.56)},anchor=north west,legend cell align=left,align=le
 -0.528679457979769	-1.84426018123875\\
 -0.533101124823205	-1.88225526293308\\
 };
-\addplot[only marks,mark=x,mark options={},mark size=1.5000pt,color=mycolor1] plot table[row sep=crcr]{%
+\addplot[only marks,mark=x,mark options={},mark size=1.5000pt,color=mycolor4] plot table[row sep=crcr]{%
 0.083	-1.9337\\
 };
-
+\addplot [color=black,dashdotted,line width=1.5pt,forget plot]
+  table[row sep=crcr]{%
+0	-0\\
+1.2	-0\\
+1.2	-2.5\\
+1.2	-4.3\\
+0	-4.3\\
+0	-2.5\\
+0	-0\\
+};
 \end{axis}
 \end{tikzpicture}%

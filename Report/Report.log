@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2016.7.7)  8 DEC 2016 14:36
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2016.7.7)  11 DEC 2016 00:46
 entering extended mode
 **./Report.tex
 (Report.tex
@@ -993,14 +993,14 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 
 ])
 (chapters/3_Implementation.tex
-<figures/scheme.png, id=98, 960.58875pt x 529.98pt>
+<figures/scheme.png, id=94, 960.58875pt x 529.98pt>
 File: figures/scheme.png Graphic file (type png)
  <use figures/scheme.png>
 Package pdftex.def Info: figures/scheme.png used on input line 12.
 (pdftex.def)             Requested size: 232.19843pt x 128.10352pt.
 
 [2 <./figures/scheme.png>]
-<figures/raycast.pdf, id=138, 305.88448pt x 322.61205pt>
+<figures/raycast.pdf, id=132, 305.88448pt x 322.61205pt>
 File: figures/raycast.pdf Graphic file (type pdf)
 
 <use figures/raycast.pdf>
@@ -1010,53 +1010,38 @@ Package pdftex.def Info: figures/raycast.pdf used on input line 113.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<figures/M.png, id=139, 1175.89313pt x 516.42938pt>
+<figures/M.png, id=133, 1175.89313pt x 516.42938pt>
 File: figures/M.png Graphic file (type png)
  <use figures/M.png>
 Package pdftex.def Info: figures/M.png used on input line 121.
 (pdftex.def)             Requested size: 180.60315pt x 79.31287pt.
 
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
 [3 <./figures/raycast.pdf> <./figures/M.png>]) (chapters/4_Results.tex
+<figures/test_map.png, id=155, 743.77875pt x 590.95781pt>
+File: figures/test_map.png Graphic file (type png)
 
-LaTeX Warning: Reference `fig:ekf_odom' on page 4 undefined on input line 15.
-
+<use figures/test_map.png>
+Package pdftex.def Info: figures/test_map.png used on input line 12.
+(pdftex.def)             Requested size: 206.39685pt x 163.98822pt.
 \figureheight=\skip50
 \figurewidth=\skip51
-(figures/ekf_odom.tikz
+ (figures/ekf_odom.tikz
+Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
 )
+Overfull \hbox (0.67584pt too wide) in paragraph at lines 2957--29
+ [][] 
+ []
 
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-Missing character: There is no ‚ in font ptmr7t!
-Missing character: There is no Ä in font ptmr7t!
-Missing character: There is no ô in font ptmr7t!
-Missing character: There is no ‚ in font ptmr7t!
-Missing character: There is no Ä in font ptmr7t!
-Missing character: There is no ô in font ptmr7t!
-Missing character: There is no ‚ in font ptmr7t!
-Missing character: There is no Ä in font ptmr7t!
-Missing character: There is no ô in font ptmr7t!
-Missing character: There is no ‚ in font ptmr7t!
-Missing character: There is no Ä in font ptmr7t!
-Missing character: There is no ô in font ptmr7t!
+[4 <./figures/test_map.png>]
 Missing character: There is no ‚ in font ptmr7t!
 Missing character: There is no Ä in font ptmr7t!
 Missing character: There is no ú in font ptmr7t!
 Missing character: There is no ‚ in font ptmr7t!
 Missing character: There is no Ä in font ptmr7t!
 Missing character: There is no ù in font ptmr7t!
-Missing character: There is no ‚ in font ptmr7t!
-Missing character: There is no Ä in font ptmr7t!
-Missing character: There is no ô in font ptmr7t!
-Missing character: There is no ‚ in font ptmr7t!
-Missing character: There is no Ä in font ptmr7t!
-Missing character: There is no ô in font ptmr7t!
 ) (chapters/5_Conclusion.tex
 Missing character: There is no √ in font ptmr7t!
 Missing character: There is no © in font ptmr7t!
@@ -1070,36 +1055,29 @@ Missing character: There is no Ä in font ptmr7t!
 Missing character: There is no ì in font ptmr7t!
 Missing character: There is no √ in font ptmr7t!
 Missing character: There is no ≠ in font ptmr7t!
-) (chapters/6_Appendices.tex [4])
-(chapters/7_Acknowledgment.tex) (chapters/8_References.tex
+)
+(chapters/6_Appendices.tex) (chapters/8_References.tex
 Missing character: There is no ‚ in font ptmr7t!
 Missing character: There is no Ä in font ptmr7t!
 Missing character: There is no ì in font ptmr7t!
-)
+) [5]
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 584.
- [5
-
-]
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 584.
  (Report.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 584.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 584.
 Package rerunfilecheck Info: File `Report.out' has not changed.
-(rerunfilecheck)             Checksum: DBE735B4A55BCC594CA3655D2BC7E9FD;1058.
-
-
-LaTeX Warning: There were undefined references.
-
+(rerunfilecheck)             Checksum: FA605446A58261351E66A4E84952793F;992.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 584.
  ) 
 Here is how much of TeX's memory you used:
- 27936 strings out of 493634
- 674165 string characters out of 8884832
- 10992748 words of memory out of 99000000
- 30786 multiletter control sequences out of 15000+200000
- 44350 words of font info for 89 fonts, out of 90000 for 9000
+ 27938 strings out of 493634
+ 674296 string characters out of 8884832
+ 10217726 words of memory out of 99000000
+ 30793 multiletter control sequences out of 15000+200000
+ 43243 words of font info for 88 fonts, out of 90000 for 9000
  1028 hyphenation exceptions out of 8191
- 62i,20n,84p,1053b,2158s stack positions out of 5000i,500n,10000p,900000b,50000s
+ 62i,19n,107p,1039b,2163s stack positions out of 5000i,500n,10000p,900000b,50000s
 {C:/Users/Markus/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/fontname/8
 r.enc}<C:/Users/Markus/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/ams
 fonts/cm/cmex10.pfb><C:/Users/Markus/AppData/Local/Programs/MiKTeX 2.9/fonts/ty
@@ -1118,9 +1096,9 @@ ata/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Users/Markus
 Markus/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/U
 sers/Markus/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmri8a.pfb
 >
-Output written on Report.pdf (5 pages, 428874 bytes).
+Output written on Report.pdf (5 pages, 495771 bytes).
 PDF statistics:
- 234 PDF objects out of 1000 (max. 8388607)
- 52 named destinations out of 1000 (max. 500000)
- 172 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 236 PDF objects out of 1000 (max. 8388607)
+ 50 named destinations out of 1000 (max. 500000)
+ 169 words of extra memory for PDF output out of 10000 (max. 10000000)
 

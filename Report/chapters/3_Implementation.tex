@@ -152,7 +152,7 @@ With $H$ being an identity matrix the formulas for the extended Kalman filter up
         }
 \end{equation}
 \begin{equation}
-R= \begin{pmatrix} 0.01 & 0 & 0 \\ 0 & 0.01 & 0 \\ 0 & 0 & 0.01\end{pmatrix}\label{R_def}
+R= \begin{pmatrix} r_{x} & 0 & 0 \\ 0 & r_{y} & 0 \\ 0 & 0 & r_{\theta}\end{pmatrix}\label{R_def}
 \end{equation}
 
 The state and covariance update equations are given in \eqref{eq:state_update_def} and \eqref{eq:cov_update_def}. For the state update the observation difference vector $V$, calculated by the ICP algorithm, as well as the Kalman gain $K(k+1)$, are used. The next covariance only depends on the predicted covariance and the Kalman gain.

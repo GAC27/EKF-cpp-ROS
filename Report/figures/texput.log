@@ -1,0 +1,19 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2016.7.7)  10 DEC 2016 20:58
+entering extended mode
+**ekf_odom.tex
+
+! Emergency stop.
+<*> ekf_odom.tex
+                
+*** (job aborted, file error in nonstop mode)
+
+ 
+Here is how much of TeX's memory you used:
+ 2 strings out of 493634
+ 18 string characters out of 8884832
+ 9052604 words of memory out of 99000000
+ 3491 multiletter control sequences out of 15000+200000
+ 3640 words of font info for 14 fonts, out of 90000 for 9000
+ 1025 hyphenation exceptions out of 8191
+ 0i,0n,0p,1b,6s stack positions out of 5000i,500n,10000p,900000b,50000s
+!  ==> Fatal error occurred, no output PDF file produced!
