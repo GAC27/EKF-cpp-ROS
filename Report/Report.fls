@@ -378,6 +378,8 @@ INPUT figures/ekf_odom.tikz
 INPUT figures/ekf_odom.tikz
 INPUT chapters/5_Conclusion.tex
 INPUT chapters/5_Conclusion.tex
+INPUT chapters/6_Appendices.tex
+INPUT chapters/6_Appendices.tex
 INPUT chapters/8_References.tex
 INPUT chapters/8_References.tex
 INPUT /usr/share/texlive/texmf-dist/fonts/vf/adobe/times/ptmri7t.vf

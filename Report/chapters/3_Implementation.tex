@@ -84,7 +84,7 @@ f = \begin{pmatrix} \hat{x}_s(k) + (R+\frac{d}{2})(sin(\hat{\theta}_s+ \beta)-si
 \label{eq:f_def}
 \end{equation}
 
-For calculation the predicted state \mbox{covariance $\Sigma_{X}(k+1|k)$} with equation \eqref{eq:cov_predict_def} the \mbox{Jacobian $F$} of the motion model function is mandatory. It can be calculated by \mbox{derivating $f$} with respect to the \mbox{state $X$.} \cite{Maneewarn}
+To calculate the predicted state \mbox{covariance $\Sigma_{X}(k+1|k)$} with equation \eqref{eq:cov_predict_def} the \mbox{Jacobian $F$} of the motion model function is mandatory. It can be calculated by \mbox{derivating $f$} with respect to the \mbox{state $X$.} \cite{Maneewarn}
 \begin{equation}\label{eq:MotionModel}
     \resizebox{0.88\hsize}{!}{%
         $F = \frac{\partial f}{\partial X} = \begin{pmatrix} 1 & 0 & (R+{\frac{d}{2}})(cos(\hat{\theta}_s+ \beta)-cos(\hat{\theta}_s)) \\ 0 & 1 & (R+\frac{d}{2})(sin(\hat{\theta}_s+ \beta)-sin(\hat{\theta}_s)) \\ 0 & 0 & 1\end{pmatrix}$%      
@@ -143,7 +143,7 @@ To do so two mismatch conditions have been implemented.
 \item ICP did not converge
 \item ICP did not match more points than the a set threshold
 \end{itemize}
-If one of these conditions is fulfilled the next \mbox{state $\hat{X}(k+1|k+1)$} and and the next \mbox{covariance $\Sigma_X (k+1|k+1)$} will be set equal to the odometry predicted \mbox{state $\hat{X}(k+1|k$} calculated with equation \eqref{eq:state_predict_def}, respectively the odometry predicted \mbox{covariance $\Sigma_{X}(k+1|k)$} of equation \eqref{eq:cov_predict_def}.
+If one of these conditions is fulfilled, the next \mbox{state $\hat{X}(k+1|k+1)$}and the next \mbox{covariance $\Sigma_X (k+1|k+1)$} will be set equal to the odometry predicted \mbox{state $\hat{X}(k+1|k)$} calculated with equation \eqref{eq:state_predict_def}, respectively the odometry predicted \mbox{covariance $\Sigma_{X}(k+1|k)$} of equation \eqref{eq:cov_predict_def}.
 
 \subsection{Update}
 \label{subsec:Update}

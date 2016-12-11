@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Debian) (preloaded format=pdflatex 2016.12.6)  11 DEC 2016 16:42
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Debian) (preloaded format=pdflatex 2016.12.6)  11 DEC 2016 17:28
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -922,14 +922,14 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 Missing character: There is no Ã in font ptmr7t!
 Missing character: There is no © in font ptmr7t!
 ) (./chapters/3_Implementation.tex
-<figures/scheme.PNG, id=95, 960.58875pt x 529.98pt>
+<figures/scheme.PNG, id=99, 960.58875pt x 529.98pt>
 File: figures/scheme.PNG Graphic file (type png)
  <use figures/scheme.PNG>
 Package pdftex.def Info: figures/scheme.PNG used on input line 12.
 (pdftex.def)             Requested size: 232.19843pt x 128.10352pt.
 
 [2 <./figures/scheme.PNG>]
-<figures/raycast.pdf, id=133, 305.88448pt x 322.61205pt>
+<figures/raycast.pdf, id=137, 305.88448pt x 322.61205pt>
 File: figures/raycast.pdf Graphic file (type pdf)
 
 <use figures/raycast.pdf>
@@ -939,13 +939,13 @@ Package pdftex.def Info: figures/raycast.pdf used on input line 113.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<figures/ICP.PNG, id=139, 902.6222pt x 576.65437pt>
+<figures/ICP.PNG, id=143, 902.6222pt x 576.65437pt>
 File: figures/ICP.PNG Graphic file (type png)
  <use figures/ICP.PNG>
 Package pdftex.def Info: figures/ICP.PNG used on input line 124.
 (pdftex.def)             Requested size: 180.60315pt x 115.38162pt.
 
-<figures/M.PNG, id=141, 1175.89313pt x 516.42938pt>
+<figures/M.PNG, id=145, 1175.89313pt x 516.42938pt>
 File: figures/M.PNG Graphic file (type png)
  <use figures/M.PNG>
 Package pdftex.def Info: figures/M.PNG used on input line 132.
@@ -953,21 +953,21 @@ Package pdftex.def Info: figures/M.PNG used on input line 132.
 
 [3 <./figures/raycast.pdf> <./figures/ICP.PNG> <./figures/M.PNG>]
 Underfull \hbox (badness 10000) in paragraph at lines 146--147
-\OT1/ptm/m/n/10 If one of these con-di-tions is ful-filled the
+\OT1/ptm/m/n/10 If one of these con-di-tions is ful-filled,
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 146--147
-\OT1/ptm/m/n/10 next [] and and the next
+\OT1/ptm/m/n/10 the next []and the next
  []
 
 
-Underfull \hbox (badness 3492) in paragraph at lines 146--147
+Underfull \hbox (badness 2080) in paragraph at lines 146--147
 \OT1/ptm/m/n/10 pre-dicted [] cal-cu-lated with equa-tion [],
  []
 
 ) (./chapters/4_Results.tex
-<figures/test_map.PNG, id=168, 743.77875pt x 590.95781pt>
+<figures/test_map.PNG, id=172, 743.77875pt x 590.95781pt>
 File: figures/test_map.PNG Graphic file (type png)
 
 <use figures/test_map.PNG>
@@ -986,7 +986,7 @@ Overfull \hbox (0.67584pt too wide) in paragraph at lines 2957--33
  []
 
 [4 <./figures/test_map.PNG>]) (./chapters/5_Conclusion.tex)
-(./chapters/8_References.tex [5]
+(./chapters/6_Appendices.tex [5]) (./chapters/8_References.tex
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
 Missing character: There is no “ in font ptmr7t!
@@ -996,18 +996,19 @@ Package atveryend Info: Empty hook `BeforeClearDocument' on input line 583.
 
 ]
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 583.
- (./Report.aux)
+
+(./Report.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 583.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 583.
 Package rerunfilecheck Info: File `Report.out' has not changed.
-(rerunfilecheck)             Checksum: CF918C50D6C178CF550E9F84E30B1F95;911.
+(rerunfilecheck)             Checksum: 53273ABA93DB00D21C27D305DF076AC2;975.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 583.
  ) 
 Here is how much of TeX's memory you used:
- 28387 strings out of 493013
- 681181 string characters out of 6135682
- 1269083 words of memory out of 5000000
- 31382 multiletter control sequences out of 15000+600000
+ 28396 strings out of 493013
+ 681336 string characters out of 6135682
+ 1269168 words of memory out of 5000000
+ 31385 multiletter control sequences out of 15000+600000
  43243 words of font info for 88 fonts, out of 8000000 for 9000
  1144 hyphenation exceptions out of 8191
  62i,20n,107p,983b,2176s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1025,10 +1026,10 @@ are/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/tex
 mf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/share/texlive/texmf-dist/fonts/
 type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times
 /utmri8a.pfb>
-Output written on Report.pdf (6 pages, 622186 bytes).
+Output written on Report.pdf (6 pages, 623607 bytes).
 PDF statistics:
- 252 PDF objects out of 1000 (max. 8388607)
- 218 compressed objects within 3 object streams
- 53 named destinations out of 1000 (max. 500000)
- 166 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 259 PDF objects out of 1000 (max. 8388607)
+ 225 compressed objects within 3 object streams
+ 56 named destinations out of 1000 (max. 500000)
+ 174 words of extra memory for PDF output out of 10000 (max. 10000000)
 
