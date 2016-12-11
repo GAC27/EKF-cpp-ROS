@@ -7,6 +7,9 @@
 
 To evaluate the implemented EKF a testing environment with a pre-defined trajectory was created. The robot would drive one rectangular shaped lap in one part of the pre-acquired map. In figure \ref{fig:test_map} the map is shown. 
 Both, the odometry states and the EKF estimated stated plus their covariance, were saved in order to compare them afterwards.
+
+The test results are shown in figure \ref{fig:ekf_odom} with the covariance ellipses being calculated as 95\,\% confidence ellipses. 
+With only the odometry measuring the current robot state, the calculated position after one lap, is about 15\,cm away from the starting point. Due to poor odometry calibration, sensor errors or wheel slippage, the odometry accumulates a lot of errors during this short distance.
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.4\textwidth]{figures/test_map}
@@ -14,11 +17,12 @@ Both, the odometry states and the EKF estimated stated plus their covariance, we
       \label{fig:test_map}
 \end{figure}
 
-The test results are shown in figure \ref{fig:ekf_odom} with the covariance ellipses being calculated as 95\,\% confidence ellipses. 
-With only the odometry measuring the current robot state, the calculated position after one lap, is about 15\,cm away from the starting point. Due to poor odometry calibration, sensor errors or wheel slippage, the odometry accumulates a lot of errors during this short distance.
-
 The EKF predicted states stay much closer to the real trajectory. Every time the ICP is able to match the predicted and the real point cloud the accumulated errors are corrected by a laser based update. Some of these corrections can be recognised as a small jump of the EKF state in figure \ref{fig:ekf_odom}. Due to the modelled motion model with its noise matrix $Q$, the covariance grows during the times, where there are no matches. It then decreases heavily with a successful match. Therefore, the shown covariance ellipses are smaller after a jump in the state. The left part of the trajectory in  figure \ref{fig:ekf_odom} shows this process. Especially as the shape of odometry only and EKF are identical. The EKF only relies on odometry information at this part, before it is able to recover with a laser based update. In the end the EKF predicted state is only about 2.5\,cm away from the actual starting position. 
 
+
+For obtaining the map displayed in figure \ref{fig:test_map} and evaluating the EKF's performance, some extra obstacles were placed in the environment. Although the implemented EKF was able to converge without these obstacles, the provided extra information by these reference objects improved its performance. Especially in the lower part of the map, with the two sideways being out of range of the laser rangefinder, the obstacles helped the EKF to match successfully.
+
+During the testing of the system, the environment was not static. The environment consisted in an elevator room where  people were walking around and doors were opened and closed. Although this was not the ideal environment, it was noticed that it did not affect the behaviour of the EKF algorithm at all. The EKF algorithm was able to remain stable in terms of position estimate and did not diverge, even though the pre-acquired map was not perfectly matching with the real world. Obviously this robustness to a dynamic environment will diminish with an increasing amount of dynamic changes to the environment.
 \begin{figure}
 	\centering
 	\newlength\figureheight 
@@ -29,10 +33,6 @@ The EKF predicted states stay much closer to the real trajectory. Every time the
       \caption{Comparison between odometry only and EKF implementation}	  
       \label{fig:ekf_odom} 
 \end{figure}
-
-For obtaining the map displayed in figure \ref{fig:test_map} and evaluating the EKF's performance, some extra obstacles were placed in the environment. Although the implemented EKF was able to converge without these obstacles, the provided extra information by these reference objects improved its performance. Especially in the lower part of the map, with the two sideways being out of range of the laser rangefinder, the obstacles helped the EKF to match successfully.
-
-During the testing of the system, the environment was not static. The environment consisted in an elevator room where  people were walking around and doors were opened and closed. Although this was not the ideal environment, it was noticed that it did not affect the behaviour of the EKF algorithm at all. The EKF algorithm was able to remain stable in terms of position estimate and did not diverge, even though the pre-acquired map was not perfectly matching with the real world. Obviously this robustness to a dynamic environment will diminish with an increasing amount of dynamic changes to the environment.
 
 \subsection{Improvements}
 \label{subsec:Improvemnts}

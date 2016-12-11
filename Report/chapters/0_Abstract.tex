@@ -6,12 +6,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{abstract}
-This project report deals with the  implementation of an extended Kalman Filter (EKF) on a mobile robot, which is equipped with a laser rangefinder (LRF). The goal of the project is to estimate the two dimensional pose of the mobile robot in real time. The available odometry information of the robot is used for the state prediction. For the observation model a map of the environment is pre-acquired and used. The laser rangefinder gives the observation information by scanning the robots environment in real time. Point clouds are then used for comparing the predicted and the real observations in the matching step.
+This project report deals with the  implementation of an extended Kalman filter (EKF) on a mobile robot, which is equipped with a laser rangefinder (LRF). The goal of the project is to estimate the two dimensional pose of the mobile robot in real time. The available odometry information of the robot is used for the state prediction. For the observation model a map of the environment is pre-acquired and used. The laser rangefinder gives the observation information by scanning the robots environment in real time. An ICP algorithm then compares the two point clouds from the predicted and the real observation.
 \end{abstract}
 
 % Note that keywords are not normally used for peerreview papers.
 \begin{IEEEkeywords}
-Extended Kalman Filter, Localization, Robotics, Laser Rangefinder, Point Clouds.
+Extended Kalman filter, Localization, Robotics, Laser Rangefinder, Point Clouds.
 \end{IEEEkeywords}
 
 % For peer review papers, you can put extra information on the cover

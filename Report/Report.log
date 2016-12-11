@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2016.7.7)  11 DEC 2016 00:46
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2016.7.7)  11 DEC 2016 14:59
 entering extended mode
 **./Report.tex
 (Report.tex
@@ -1010,18 +1010,39 @@ Package pdftex.def Info: figures/raycast.pdf used on input line 113.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<figures/M.png, id=133, 1175.89313pt x 516.42938pt>
+<figures/ICP.png, id=138, 902.6222pt x 576.65437pt>
+File: figures/ICP.png Graphic file (type png)
+ <use figures/ICP.png>
+Package pdftex.def Info: figures/ICP.png used on input line 124.
+(pdftex.def)             Requested size: 180.60315pt x 115.38162pt.
+
+<figures/M.png, id=140, 1175.89313pt x 516.42938pt>
 File: figures/M.png Graphic file (type png)
  <use figures/M.png>
-Package pdftex.def Info: figures/M.png used on input line 121.
+Package pdftex.def Info: figures/M.png used on input line 132.
 (pdftex.def)             Requested size: 180.60315pt x 79.31287pt.
 
-[3 <./figures/raycast.pdf> <./figures/M.png>]) (chapters/4_Results.tex
-<figures/test_map.png, id=155, 743.77875pt x 590.95781pt>
+[3 <./figures/raycast.pdf> <./figures/ICP.png> <./figures/M.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 146--147
+\OT1/ptm/m/n/10 If one of these con-di-tions is ful-filled the
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 146--147
+\OT1/ptm/m/n/10 next [] and and the next
+ []
+
+
+Underfull \hbox (badness 3492) in paragraph at lines 146--147
+\OT1/ptm/m/n/10 pre-dicted [] cal-cu-lated with equa-tion [],
+ []
+
+) (chapters/4_Results.tex
+<figures/test_map.png, id=166, 743.77875pt x 590.95781pt>
 File: figures/test_map.png Graphic file (type png)
 
 <use figures/test_map.png>
-Package pdftex.def Info: figures/test_map.png used on input line 12.
+Package pdftex.def Info: figures/test_map.png used on input line 15.
 (pdftex.def)             Requested size: 206.39685pt x 163.98822pt.
 \figureheight=\skip50
 \figurewidth=\skip51
@@ -1031,7 +1052,7 @@ Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
 )
-Overfull \hbox (0.67584pt too wide) in paragraph at lines 2957--29
+Overfull \hbox (0.67584pt too wide) in paragraph at lines 2957--33
  [][] 
  []
 
@@ -1056,7 +1077,7 @@ Missing character: There is no “ in font ptmr7t!
 Missing character: There is no Ã in font ptmr7t!
 Missing character: There is no ­ in font ptmr7t!
 )
-(chapters/6_Appendices.tex) (chapters/8_References.tex
+(chapters/8_References.tex
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
 Missing character: There is no “ in font ptmr7t!
@@ -1067,17 +1088,17 @@ Package atveryend Info: Empty hook `AfterLastShipout' on input line 584.
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 584.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 584.
 Package rerunfilecheck Info: File `Report.out' has not changed.
-(rerunfilecheck)             Checksum: FA605446A58261351E66A4E84952793F;992.
+(rerunfilecheck)             Checksum: C7B46C748F83E619866F0AC439918083;927.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 584.
  ) 
 Here is how much of TeX's memory you used:
- 27938 strings out of 493634
- 674296 string characters out of 8884832
- 10217726 words of memory out of 99000000
- 30793 multiletter control sequences out of 15000+200000
+ 27944 strings out of 493634
+ 674345 string characters out of 8884832
+ 10220083 words of memory out of 99000000
+ 30799 multiletter control sequences out of 15000+200000
  43243 words of font info for 88 fonts, out of 90000 for 9000
  1028 hyphenation exceptions out of 8191
- 62i,19n,107p,1039b,2163s stack positions out of 5000i,500n,10000p,900000b,50000s
+ 62i,20n,107p,1039b,2167s stack positions out of 5000i,500n,10000p,900000b,50000s
 {C:/Users/Markus/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/fontname/8
 r.enc}<C:/Users/Markus/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/ams
 fonts/cm/cmex10.pfb><C:/Users/Markus/AppData/Local/Programs/MiKTeX 2.9/fonts/ty
@@ -1096,9 +1117,9 @@ ata/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Users/Markus
 Markus/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/U
 sers/Markus/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmri8a.pfb
 >
-Output written on Report.pdf (5 pages, 495771 bytes).
+Output written on Report.pdf (5 pages, 646156 bytes).
 PDF statistics:
- 236 PDF objects out of 1000 (max. 8388607)
- 50 named destinations out of 1000 (max. 500000)
- 169 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 244 PDF objects out of 1000 (max. 8388607)
+ 52 named destinations out of 1000 (max. 500000)
+ 166 words of extra memory for PDF output out of 10000 (max. 10000000)
 
